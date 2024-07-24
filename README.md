@@ -1,2 +1,2 @@
-# MinecraftC
-Minecraft in C
+# Minecraft
+Minecraft in C++
