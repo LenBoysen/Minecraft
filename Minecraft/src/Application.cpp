@@ -1,81 +1,56 @@
-#include <GLFW/glfw3.h>
-#include <string>
-#include <iostream>
+#include "Application.h"
+
+Application::~Application() {
+
+	//m_Renderer.~Renderer();
+	
+	std::cout << "Application deconstructing.";
+}
+
+Application::Application(uint32_t width, uint32_t height, const std::string& Title) : m_WindowWidth(width), m_WindowHeight(height), m_WindowTitle(Title), m_Running(false){
+
+	std::cout << "Application constructing.";
+}
+
+Application::Application() : Application(1920, 1080, "Minecraft") {
+
+	std::cout << "Application constructing.";
+}
+
+void Application::run() {
+	WindowInit();
+	m_Renderer.Init(m_Window);
+	while (!glfwWindowShouldClose(m_Window))
+	{
+		m_Renderer.Render();
+		glfwSwapBuffers(m_Window);
+		glfwPollEvents();
+	}
+}
 
 
 
-class Application {
 
 
+void Application::WindowInit() {
 
-
-public:
-
-	~Application() {
-		glfwDestroyWindow(m_Window);
+	if (!glfwInit())
+		exit(EXIT_FAILURE);
+	
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+	m_Window = glfwCreateWindow(m_WindowWidth, m_WindowHeight, m_WindowTitle.c_str(), NULL, NULL);
+	if (!m_Window)
+	{
+		std::cerr << "GLFWwindow was not created.";
 		glfwTerminate();
-		std::cout << "Application deconstructing.";
+		exit(EXIT_FAILURE);
 	}
+	m_Running = true;
+	glfwMakeContextCurrent(m_Window);
 
-	Application(unsigned int width, unsigned int height, std::string Title) : m_WindowWidth(width), m_WindowHeight(height), m_WindowTitle(Title), m_Running(false){
-
-		std::cout << "Application constructing.";
-	}
-
-	Application() : Application(1920, 1080, "Minecraft") {
-
-		std::cout << "Application constructing.";
-	}
-
-	void run() {
-		WindowInit();
-		while (!glfwWindowShouldClose(m_Window))
-		{
-
-			glfwSwapBuffers(m_Window);
-			glfwPollEvents();
-		}
-	}
-private:
-	void WindowInit() {
-
-		if (!glfwInit())
-			exit(EXIT_FAILURE);
-
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-		m_Window = glfwCreateWindow(m_WindowWidth, m_WindowHeight, m_WindowTitle.c_str(), NULL, NULL);
-		if (!m_Window)
-		{
-			std::cerr << "GLFWwindow was not created.";
-			glfwTerminate();
-			exit(EXIT_FAILURE);
-		}
-		m_Running = true;
-		glfwMakeContextCurrent(m_Window);
-
-		glfwSwapInterval(1);
+	
 
 		
 
-	}
-
-private:
-	bool m_Running = false;
-	GLFWwindow* m_Window = nullptr;
-	unsigned int m_WindowWidth;
-	unsigned int m_WindowHeight;
-	std::string m_WindowTitle;
-};
-
-
-
-void main() {
-
-	Application* app = new Application();
-
-	//app->run();
-
-	//app->~Application();
-	delete app;
 }

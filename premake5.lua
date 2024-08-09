@@ -1,6 +1,7 @@
 workspace "Minecraft"
 	architecture "x64"
 	startproject "Minecraft"
+	buildoptions { "/MP" } --Multi threaded compiling
 
 	configurations
 	{
@@ -79,7 +80,16 @@ project "Minecraft"
 		optimize "On"
 --]]
 
-include "Minecraft/vendor/glfw"
+IncludeDir ={}
+
+IncludeDir["GLFW"] = "Minecraft/vendor/GLFW/include"
+IncludeDir["Glad"] = "Minecraft/vendor/Glad/include"
+IncludeDir["glm"] = "Minecraft/vendor/glm"
+IncludeDir["ImGui"] = "Minecraft/vendor/imgui"
+
+include "Minecraft/vendor/GLFW"
+include "Minecraft/vendor/Glad"
+include "Minecraft/vendor/imgui"
 
 project "Minecraft"
 	location "Minecraft"
@@ -92,21 +102,34 @@ project "Minecraft"
 	files
 	{
 		"%{prj.name}/src/**.h",
-		"%{prj.name}/src/**.cpp"
+		"%{prj.name}/src/**.cpp"--,
+		--"%{prj.name}/vendor/glm/glm/**.h",
+		--"%{prj.name}/vendor/glm/glm/**.hpp"
 	}
 
 	includedirs
 	{
 		"%{prj.name}/src",
-		"%{prj.name}/vendor/glfw/include",
-		"%{prj.name}/vendor/glfw/bin/" .. outputdir .. "/GLFW",
+		"%{IncludeDir.GLFW}",
+		"%{IncludeDir.Glad}",
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.ImGui}"
+		--"%{prj.name}/vendor/glfw/bin/" .. outputdir .. "/GLFW",
 		--"Minecraft/src"
 	}
+
+
+	--libdirs
+	--{
+	--	"%{prj.name}/vendor/GLFW/bin/" .. outputdir .. "/GLFW"
+	--}
 
 	links
 	{
 		"GLFW",
-		"opengl32"
+		"Glad",	
+		"ImGui",
+		"opengl32.lib"
 		--"EasyEngine"
 	}
 
@@ -115,28 +138,30 @@ project "Minecraft"
 		cppdialect "c++20"
 		staticruntime "On"
 		systemversion "10.0"
-	
+		defines
+			{
+				"GLFW_INCLUDE_NONE",
+				--"EY_PLATFORM_WINDOWS",
+				"_CONSOLE"
+			}
 		
 		filter "configurations:Debug"
 			defines
 			{
-				--"EY_PLATFORM_WINDOWS",
-				"_DEBUG",
-				"_CONSOLE"
+				
+				"_DEBUG"
 			}
 		filter "configurations:Release"
 			defines
 			{
-				--"EY_PLATFORM_WINDOWS",
-				"NDEBUG",
-				"_CONSOLE"
+				
+				"NDEBUG"
 			}
 		filter "configurations:Dist"
 			defines
 			{
-				--"EY_PLATFORM_WINDOWS",
-				"NDEBUG",
-				"_CONSOLE"
+				
+				"NDEBUG"
 			}
 
 
