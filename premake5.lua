@@ -89,7 +89,7 @@ IncludeDir["ImGui"] = "Minecraft/vendor/imgui"
 
 include "Minecraft/vendor/GLFW"
 include "Minecraft/vendor/Glad"
-include "Minecraft/vendor/imgui"
+include "Minecraft/vendor/imguiPremake"
 
 project "Minecraft"
 	location "Minecraft"
