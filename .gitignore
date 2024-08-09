@@ -3,3 +3,5 @@
 /bin-int/
 **.vcxproj*
 *.sln
+/Minecraft/vendor/Glad/bin-int/
+Minecraft/vendor/Glad/bin/

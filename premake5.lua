@@ -136,7 +136,7 @@ project "Minecraft"
 
 	filter "system:windows"
 		cppdialect "c++20"
-		staticruntime "On"
+		staticruntime "off"
 		systemversion "10.0"
 		defines
 			{
