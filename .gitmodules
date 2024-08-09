@@ -1,9 +1,9 @@
 [submodule "Minecraft/vendor/GLFW"]
 	path = Minecraft/vendor/GLFW
 	url = git@github.com:TheCherno/glfw.git
-[submodule "Minecraft/vendor/glm"]
-	path = Minecraft/vendor/glm
-	url = git@github.com:g-truc/glm.git
 [submodule "Minecraft/vendor/imgui"]
 	path = Minecraft/vendor/imgui
 	url = git@github.com:ocornut/imgui.git
+[submodule "Minecraft/vendor/glm"]
+	path = Minecraft/vendor/glm
+	url = git@github.com:g-truc/glm.git
