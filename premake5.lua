@@ -62,7 +62,17 @@ project "Minecraft"
 	}
 
 
+	filter "system:linux"
+		pic "On"  -- Position Independent Code (PIC) for shared libraries
+		systemversion "latest"
 
+		links
+		{
+			"X11",
+			"pthread",
+			"dl",
+			"GL",
+		}
 
 	filter "system:windows"
 		systemversion "10.0"
