@@ -34,8 +34,6 @@ project "Minecraft"
 
 
 	
-	filter "action:gmake2"
-		buildoptions { "-MP" } --Multi threaded compiling
 
 
 	
@@ -77,8 +75,15 @@ project "Minecraft"
 			"kernel32", "opengl32",
 		}
 
-		filter "action:vs*"
-			buildoptions { "/MP" } --Multi threaded compiling
+	
+	
+
+	
+	filter "action:gmake2"
+		buildoptions { "-MP" } --Multi threaded compiling
+
+	filter "action:vs*"
+		buildoptions { "/MP" } --Multi threaded compilin
 
 
 	
