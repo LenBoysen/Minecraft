@@ -56,8 +56,6 @@ project "Minecraft"
 		"%{IncludeDir.ImGui}"
 	}
 
-
-
 	links
 	{
 		"GLFW",
@@ -65,22 +63,25 @@ project "Minecraft"
 		"ImGui",
 	}
 
+
+
+
 	filter "system:windows"
 		systemversion "10.0"
 
-		filter "action:vs*"
-			buildoptions { "/MP" } --Multi threaded compiling
-
+		
 		links
 		{
 			"gdi32", "user32", 
 			"shell32", "advapi32", 
 			"kernel32", "opengl32",
-			--"EasyEngine"
 		}
 
+		filter "action:vs*"
+			buildoptions { "/MP" } --Multi threaded compiling
 
 
+	
 
 	defines
 	{

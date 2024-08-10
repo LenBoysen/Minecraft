@@ -1,7 +1,7 @@
 #pragma once
 #include "Scene.h".
-#include <GLFW/glfw3.h>
 #include <glad/glad.h>
+#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include "ImGui/ImGuiLayer.h"
 #include<map>
