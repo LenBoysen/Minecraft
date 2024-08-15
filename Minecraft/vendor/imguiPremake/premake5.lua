@@ -11,13 +11,14 @@ project "ImGui"
         "../imgui/imconfig.h",
         "../imgui/imgui.h",
         "../imgui/imgui.cpp",
+        "../imgui/imgui_demo.cpp",
         "../imgui/imgui_draw.cpp",
         "../imgui/imgui_internal.h",
+        "../imgui/imgui_tables.cpp",
         "../imgui/imgui_widgets.cpp",
-        "../imgui/imgui_rectpack.h",
-        "../imgui/imgui_textedit.h",
-        "../imgui/imgui_truetype.h",
-        "../imgui/imgui_demo.cpp"
+        "../imgui/imstb_rectpack.h",
+        "../imgui/imstb_textedit.h",
+        "../imgui/imstb_truetype.h",
     }
 	filter "system:windows"
 		cppdialect "c++20"

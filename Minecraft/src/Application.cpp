@@ -1,56 +1,80 @@
 #include "Application.h"
 
+
+
+#define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
+
 Application::~Application() {
 
-	//m_Renderer.~Renderer();
 	
-	std::cout << "Application deconstructing.";
+	std::cout << "Application deconstructing." << std::endl;
 }
 
-Application::Application(uint32_t width, uint32_t height, const std::string& Title) : m_WindowWidth(width), m_WindowHeight(height), m_WindowTitle(Title), m_Running(false){
+Application* Application::s_Instace = nullptr;
 
-	std::cout << "Application constructing.";
+Application::Application(){
+	s_Instace = this;
+	std::cout << "Application constructing." << std::endl;
+	m_Window = std::unique_ptr<Window>(Window::Create());
+	m_Window->SetEventCallback(BIND_EVENT_FN(onEvent));
 }
 
-Application::Application() : Application(1920, 1080, "Minecraft") {
-
-	std::cout << "Application constructing.";
-}
 
 void Application::run() {
-	WindowInit();
-	m_Renderer.Init(m_Window);
-	while (!glfwWindowShouldClose(m_Window))
+	
+	m_LayerStack.PushLayer(new RenderLayer);
+	m_LayerStack.PushOverlay(new ImGuiLayer);
+	//Renderer m_Renderer;
+	//m_Renderer.Init(m_Window);
+	while (m_Running)
 	{
-		m_Renderer.Render();
-		glfwSwapBuffers(m_Window);
-		glfwPollEvents();
+		glClearColor(0, 0, 0, 1);
+		glClear(GL_COLOR_BUFFER_BIT);
+		for(Layer* layer : m_LayerStack){
+			layer->onUpdate();
+		}
+		m_Window->onUpdate();
 	}
 }
 
 
 
 
+//void Application::onEvent(Event & event){
+//	EventDispatcher dispatcher(event);
+//	dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(onWindowClose));
+//	
+//	for(auto it = m_LayerStack.end(); it != m_LayerStack.begin()){
+//		(*--it).OnEvent(e);
+//		if(e.Handled)
+//			brake;
+//}
 
-void Application::WindowInit() {
 
-	if (!glfwInit())
-		exit(EXIT_FAILURE);
-	
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-	m_Window = glfwCreateWindow(m_WindowWidth, m_WindowHeight, m_WindowTitle.c_str(), NULL, NULL);
-	if (!m_Window)
+void Application::pushLayer(Layer*layer){
+	m_LayerStack.PushLayer(layer);
+}
+void Application::pushOverlay(Layer* layer){
+	m_LayerStack.PushOverlay(layer);
+}
+
+void Application::onEvent(Event& e)
+{
+	EventDispatcher dispatcher(e);
+	dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClose));
+
+	for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
 	{
-		std::cerr << "GLFWwindow was not created.";
-		glfwTerminate();
-		exit(EXIT_FAILURE);
+		(*--it)->onEvent(e);
+		if (e.Handled)
+			break;
 	}
-	m_Running = true;
-	glfwMakeContextCurrent(m_Window);
 
-	
 
-		
+}
 
+bool Application::OnWindowClose(WindowCloseEvent & e)
+{
+	m_Running = false;
+	return true;
 }

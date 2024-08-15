@@ -1,16 +1,16 @@
 #pragma once
 
-
 #include "Renderer.h"
 #include <cassert>
 #include <string>
 #include <iostream>
+#include "Window.h"
+#include "LayerStack.h"
+#include "events/Event.h"
+#include "events/ApplicationEvent.h"
 
 
 class Application {
-
-
-
 
 public:
 
@@ -21,15 +21,30 @@ public:
 	Application();
 
 	void run();
+	
+	void pushLayer(Layer* layer);
+
+	void pushOverlay(Layer* layer);
+
+	void onEvent(Event& e);
+
+
+	inline static Application& Get() { return *s_Instace; }
+	inline Window& getWindow(){ return *m_Window; }
+
+	inline unsigned int getWindowHeight() const { return m_WindowHeight;}
+	inline unsigned int getWindowWidth() const { return m_WindowWidth; }
+private:
+	bool OnWindowClose(WindowCloseEvent& e);
 
 private:
-	void WindowInit();
-private:
 	
-	GLFWwindow* m_Window = nullptr;
-	uint32_t m_WindowWidth;
-	uint32_t m_WindowHeight;
+	static Application* s_Instace;
+	std::unique_ptr<Window> m_Window;
+	unsigned int m_WindowHeight;
+	unsigned int m_WindowWidth;
 	std::string m_WindowTitle;
-	bool m_Running = false;
-	Renderer m_Renderer;
+	bool m_Running = true;
+	//Renderer m_Renderer;
+	LayerStack m_LayerStack;
 };

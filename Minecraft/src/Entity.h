@@ -23,6 +23,8 @@ private:
 
 };
 
+
+
 class Object : public Entity {
 public:
 	Object(float x, float y, float z);

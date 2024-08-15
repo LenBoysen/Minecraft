@@ -1,7 +1,7 @@
 workspace "Minecraft"
 	architecture "x64"
 	startproject "Minecraft"
-	
+
 
 	configurations
 	{
@@ -11,12 +11,13 @@ workspace "Minecraft"
 	}
 	outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
-
 IncludeDir ={}
 IncludeDir["GLFW"] = "Minecraft/vendor/GLFW/include"
 IncludeDir["Glad"] = "Minecraft/vendor/Glad/include"
 IncludeDir["glm"] = "Minecraft/vendor/glm"
 IncludeDir["ImGui"] = "Minecraft/vendor/imgui"
+
+require "vendor/premake-export-compile-commands/export-compile-commands"
 
 include "Minecraft/vendor/GLFW"
 include "Minecraft/vendor/Glad"
@@ -33,18 +34,18 @@ project "Minecraft"
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
 
-	
 
 
-	
+
+
 	files
 	{
 
 		"%{prj.name}/src/**.h",
 		"%{prj.name}/src/**.cpp",
-		
+
 	}
-	
+
 
 	includedirs
 	{
@@ -57,9 +58,10 @@ project "Minecraft"
 	links
 	{
 		"GLFW",
-		"Glad",	
+		"Glad",
 		"ImGui",
 	}
+
 
 
 	filter "system:linux"
@@ -77,33 +79,47 @@ project "Minecraft"
 	filter "system:windows"
 		systemversion "10.0"
 
-		
+
 		links
 		{
-			"gdi32", "user32", 
-			"shell32", "advapi32", 
+			"gdi32", "user32",
+			"shell32", "advapi32",
 			"kernel32", "opengl32",
 		}
 
-	
-	
 
-	
+
+
+
 	filter "action:gmake2"
 		buildoptions { "-MP" } --Multi threaded compiling
+		filter "configurations:Debug"
+			prebuildcommands
+			{
+				--"{COPYFILE} %[./compile_commands/debug.json] %[./compile_commands.json]"
+			}
+		filter "configurations:Release"
+			prebuildcommands
+			{
+				"{COPYFILE} %[./compile_commands/release.json] %[./compile_commands.json]"
+			}
+		filter "configurations:Dist"
+			prebuildcommands
+			{
+				"{COPYFILE} %[./compile_commands/dist.json] %[./compile_commands.json]"
+			}
 
 	filter "action:vs*"
 		buildoptions { "/MP" } --Multi threaded compilin
 
 
-	
+
 
 	defines
 	{
 		"GLFW_INCLUDE_NONE",
 		"_CONSOLE"
 	}
-	
 	filter "configurations:Debug"
 		defines
 		{
@@ -112,10 +128,11 @@ project "Minecraft"
 		}
 		symbols "On"
 
+		
+
 	filter "configurations:Release"
 		defines
 		{
-			
 			"NDEBUG",
 			"MC_RELEASE",
 		}
@@ -123,8 +140,20 @@ project "Minecraft"
 	filter "configurations:Dist"
 		defines
 		{
-			
 			"NDEBUG",
 			"MC_DIST",
 		}
 		optimize "On"
+if _ACTION == "gmake2" then
+	printf(_ACTION)
+	os.execute(_PREMAKE_COMMAND .. " export-compile-commands")
+	os.copyfile("./compile_commands/debug.json", "./compile_commands.json")
+end
+if _ACTION == "clean" then
+	os.remove("./compile_commands.json")
+	os.remove("./Minecraft.sln")
+	os.remove("./Makefile")
+	os.rmdir("./compile_commands/")
+	os.rmdir("./bin/")
+	os.rmdir("./bin-int/")
+end

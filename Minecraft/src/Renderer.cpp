@@ -33,8 +33,8 @@ Renderer::~Renderer() {
 
 
 
-void Renderer::Init(GLFWwindow* window){
-	m_Window = window;
+
+Renderer::Renderer(){
 
 	bool status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 	assert(status);
@@ -111,6 +111,8 @@ void Renderer::Init(GLFWwindow* window){
 		Scene() << (Object()	<< glm::vec3{ 0.0f , 1.0f, 1.0f }
 								<< glm::vec3{ 1.0f , 0.0f, 1.0f }
 								<< glm::vec3{ -1.0f, 0.0f, 1.0f })));
+
+
 }
 
 
@@ -149,3 +151,38 @@ void Renderer::RenderScene(const Scene& sc) const{
 
 
 
+void RenderLayer::setRenderer(Renderer& renderer) {
+	m_Renderer = &renderer;
+
+}
+
+
+
+RenderLayer::RenderLayer() : Layer("Render Layer")
+{
+}
+
+void RenderLayer::onAttach()
+{
+	Application& app = Application::Get();
+
+
+	m_Renderer = new Renderer();
+
+
+}
+
+void RenderLayer::onDetach()
+{
+	delete m_Renderer;
+}
+
+void RenderLayer::onUpdate()
+{
+	m_Renderer->Render();
+}
+
+void RenderLayer::onEvent(Event& e)
+{
+	std::cout << "RenderLayer" << std::endl;
+}

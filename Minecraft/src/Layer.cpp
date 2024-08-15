@@ -1,6 +1,7 @@
 #include "Layer.h"
 
-Layer::Layer()
+Layer::Layer(const std::string& name)
+	: m_Name(name)
 {
 }
 

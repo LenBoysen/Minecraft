@@ -15,11 +15,13 @@ LayerStack::~LayerStack()
 void LayerStack::PushLayer(Layer* layer)
 {
 	m_LayerInsert = m_Layers.emplace(m_LayerInsert, layer);
+	layer->onAttach();
 }
 
 void LayerStack::PushOverlay(Layer* overlay)
 {
 	 m_Layers.emplace_back(overlay);
+	 overlay->onAttach();
 }
 
 void LayerStack::PopLayer(Layer* layer)

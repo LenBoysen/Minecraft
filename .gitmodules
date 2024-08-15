@@ -7,3 +7,6 @@
 [submodule "Minecraft/vendor/glm"]
 	path = Minecraft/vendor/glm
 	url = git@github.com:g-truc/glm.git
+[submodule "vendor/premake-export-compile-commands"]
+	path = vendor/premake-export-compile-commands
+	url = https://github.com/tarruda/premake-export-compile-commands.git
