@@ -4,10 +4,13 @@
 #include <cassert>
 #include <string>
 #include <iostream>
-#include "Window.h"
+#include <memory>
 #include "LayerStack.h"
+#include "Input.h"
+#include "Window.h"
 #include "events/Event.h"
 #include "events/ApplicationEvent.h"
+#include "ImGui/ImGuiLayer.h"
 
 
 class Application {
@@ -16,8 +19,7 @@ public:
 
 	~Application();
 
-	Application(uint32_t width, uint32_t height, const std::string& Title);
-
+	Application(const WindowProps& props);
 	Application();
 
 	void run();
@@ -32,19 +34,14 @@ public:
 	inline static Application& Get() { return *s_Instace; }
 	inline Window& getWindow(){ return *m_Window; }
 
-	inline unsigned int getWindowHeight() const { return m_WindowHeight;}
-	inline unsigned int getWindowWidth() const { return m_WindowWidth; }
 private:
 	bool OnWindowClose(WindowCloseEvent& e);
 
-private:
-	
-	static Application* s_Instace;
 	std::unique_ptr<Window> m_Window;
-	unsigned int m_WindowHeight;
-	unsigned int m_WindowWidth;
-	std::string m_WindowTitle;
+	ImGuiLayer* m_ImGuiLayer;
 	bool m_Running = true;
-	//Renderer m_Renderer;
 	LayerStack m_LayerStack;
+
+private:
+	static Application* s_Instace;
 };

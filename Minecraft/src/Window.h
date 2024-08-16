@@ -12,7 +12,7 @@ struct WindowProps
 	unsigned int Width;
 	unsigned int Height;
 
-	WindowProps(const std::string& title = "Hazel Engine",
+	WindowProps(const std::string& title = "Engine",
 		unsigned int width = 1280,
 		unsigned int height = 720)
 		: Title(title), Width(width), Height(height)
@@ -32,6 +32,8 @@ public:
 
 	virtual unsigned int GetWidth() const = 0;
 	virtual unsigned int GetHeight() const = 0;
+
+	virtual void* GetNativeWindow() const = 0;
 
 	// Window attributes
 	virtual void SetEventCallback(const EventCallbackFn& callback) = 0;

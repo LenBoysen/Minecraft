@@ -17,22 +17,34 @@ Application::Application(){
 	std::cout << "Application constructing." << std::endl;
 	m_Window = std::unique_ptr<Window>(Window::Create());
 	m_Window->SetEventCallback(BIND_EVENT_FN(onEvent));
+	m_ImGuiLayer = new ImGuiLayer();
+	pushOverlay(m_ImGuiLayer);
+}
+
+Application::Application(const WindowProps& props) {
+	s_Instace = this;
+	std::cout << "Application constructing." << std::endl;
+	m_Window = std::unique_ptr<Window>(Window::Create(props));
+	m_Window->SetEventCallback(BIND_EVENT_FN(onEvent));
+
+	m_ImGuiLayer = new ImGuiLayer();
+	pushOverlay(m_ImGuiLayer);
 }
 
 
 void Application::run() {
 	
-	m_LayerStack.PushLayer(new RenderLayer);
-	m_LayerStack.PushOverlay(new ImGuiLayer);
-	//Renderer m_Renderer;
-	//m_Renderer.Init(m_Window);
 	while (m_Running)
 	{
 		glClearColor(0, 0, 0, 1);
 		glClear(GL_COLOR_BUFFER_BIT);
-		for(Layer* layer : m_LayerStack){
+		for(Layer* layer : m_LayerStack)
 			layer->onUpdate();
-		}
+
+		((ImGuiLayer*)m_ImGuiLayer)->begin();
+		for (Layer* layer : m_LayerStack)
+			layer->onImGuiRender();
+		((ImGuiLayer*)m_ImGuiLayer)->end();
 		m_Window->onUpdate();
 	}
 }
