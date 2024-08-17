@@ -1,5 +1,7 @@
-#include"Application.h"
-#include "imgui.h"
+#include "Engine.h"
+
+
+#include"imgui.h"
 
 
 class Minecraft3DLayer : public Layer {
@@ -8,7 +10,7 @@ public:
 	Minecraft3DLayer() : Layer("Minecraft3DLayer") {
 	}
 
-	virtual void onAttach() override{
+	virtual void onAttach() override {
 
 	}
 	virtual void onDetach() override {
@@ -30,17 +32,17 @@ public:
 		ImGui::Text("Hallo von Minecraft!");
 		ImGui::End();
 	}
-	
+
 };
 
 
 
 class Minecraft : public Application {
 public:
-	Minecraft() : Application(WindowProps("Minecraft", 1280, 720)){
+	Minecraft() : Application(WindowProps("Minecraft", 1280, 720)) {
 		pushLayer(new Minecraft3DLayer);
 	}
-	
+
 	~Minecraft() {
 
 	}
@@ -48,14 +50,6 @@ private:
 
 };
 
-
-
-int main() {
-	Minecraft* minecraft = new Minecraft();
-
-	minecraft->run();
-
-	delete minecraft;
-
-	return 0;
+Application* CreateApplication() {
+	return new Minecraft;
 }

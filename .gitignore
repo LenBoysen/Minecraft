@@ -5,6 +5,6 @@
 **.vcxproj*
 *.sln
 Makefile
-/Minecraft/vendor/Glad/bin-int/
-Minecraft/vendor/Glad/bin/
-Minecraft/imgui.ini
+/Engine/vendor/Glad/bin-int/
+Engine/vendor/Glad/bin/
+Engine/imgui.ini

@@ -1,11 +1,11 @@
-[submodule "Minecraft/vendor/GLFW"]
-	path = Minecraft/vendor/GLFW
+[submodule "Engine/vendor/GLFW"]
+	path = Engine/vendor/GLFW
 	url = git@github.com:TheCherno/glfw.git
-[submodule "Minecraft/vendor/imgui"]
-	path = Minecraft/vendor/imgui
+[submodule "Engine/vendor/imgui"]
+	path = Engine/vendor/imgui
 	url = git@github.com:ocornut/imgui.git
-[submodule "Minecraft/vendor/glm"]
-	path = Minecraft/vendor/glm
+[submodule "Engine/vendor/glm"]
+	path = Engine/vendor/glm
 	url = git@github.com:g-truc/glm.git
 [submodule "vendor/premake-export-compile-commands"]
 	path = vendor/premake-export-compile-commands

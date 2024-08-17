@@ -13,7 +13,6 @@
 #include <unordered_set>
 
 
-
 #define BIT(x) (1 << x)
 
 enum class EventType

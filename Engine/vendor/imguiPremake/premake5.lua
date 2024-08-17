@@ -21,7 +21,7 @@ project "ImGui"
         "../imgui/imstb_truetype.h",
     }
 	filter "system:windows"
-		cppdialect "c++20"
+		cppdialect "c++17"
 		staticruntime "On"
 		systemversion "10.0"	
 

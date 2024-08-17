@@ -1,7 +1,6 @@
 #pragma once
 #include<string>
 #include<vector>
-
 #include <glm/glm.hpp>
 
 
@@ -11,7 +10,6 @@ typedef uint32_t EntityId;
 class Entity {
 
 public:
-	Entity() = default;
 
 	inline const std::string GetName() const { return m_Name; }
 	inline const EntityId GetEntityId() const { return m_EntityId; }

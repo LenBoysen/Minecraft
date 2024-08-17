@@ -5,12 +5,14 @@
 #include <string>
 #include <iostream>
 #include <memory>
+
 #include "LayerStack.h"
 #include "Input.h"
 #include "Window.h"
 #include "events/Event.h"
 #include "events/ApplicationEvent.h"
 #include "ImGui/ImGuiLayer.h"
+
 
 
 class Application {
@@ -21,6 +23,7 @@ public:
 
 	Application(const WindowProps& props);
 	Application();
+	
 
 	void run();
 	
@@ -45,3 +48,5 @@ private:
 private:
 	static Application* s_Instace;
 };
+
+extern Application* CreateApplication();

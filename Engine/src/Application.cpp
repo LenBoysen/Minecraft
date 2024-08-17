@@ -1,4 +1,5 @@
 #include "Application.h"
+#include "imgui.h"
 
 
 
@@ -21,6 +22,7 @@ Application::Application(){
 	pushOverlay(m_ImGuiLayer);
 }
 
+
 Application::Application(const WindowProps& props) {
 	s_Instace = this;
 	std::cout << "Application constructing." << std::endl;
@@ -29,8 +31,11 @@ Application::Application(const WindowProps& props) {
 
 	m_ImGuiLayer = new ImGuiLayer();
 	pushOverlay(m_ImGuiLayer);
+
+	
 }
 
+extern Application* CreateApplication();
 
 void Application::run() {
 	
@@ -90,3 +95,4 @@ bool Application::OnWindowClose(WindowCloseEvent & e)
 	m_Running = false;
 	return true;
 }
+
