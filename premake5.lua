@@ -30,7 +30,7 @@ project "Engine"
 	kind "StaticLib"
 	language "C++"
 	cppdialect "c++17"
-	staticruntime "On"
+	staticruntime "off"
 	warnings "off"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
@@ -163,7 +163,7 @@ project "Minecraft"
 	kind "ConsoleApp"
 	language "C++"
 	cppdialect "c++17"
-	staticruntime "on"
+	staticruntime "off"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
