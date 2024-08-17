@@ -40,8 +40,8 @@ project "Engine"
 	postbuildcommands
 	{
 		--"{COPYFILE} %[cfg.buildtarget.directory] %[/bin/" .. outputdir .. "/Minecraft]"
-		("{MKDIR} ../bin/" .. outputdir .. "/Minecraft"),
-		("{COPYFILE} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/Minecraft")
+		--("{MKDIR} ../bin/" .. outputdir .. "/Minecraft"),
+		--("{COPYFILE} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/Minecraft")
 	}
 
 
@@ -98,8 +98,7 @@ project "Engine"
 
 
 
-
-	filter "action:gmake2"
+	if _ACTION == "gmake2" then
 		buildoptions { "-MP" } --Multi threaded compiling
 		filter "configurations:Debug"
 			prebuildcommands
@@ -116,9 +115,13 @@ project "Engine"
 			{
 				"{COPYFILE} %[./compile_commands/dist.json] %[./compile_commands.json]"
 			}
-
-	filter "action:vs*"
+	end
+		
+	if _ACTION == "vs2022" then
+		filter "action:vs*"
 		buildoptions { "/MP" } --Multi threaded compilin
+	end
+	
 
 
 
@@ -248,9 +251,34 @@ if _ACTION == "gmake2" then
 end
 if _ACTION == "clean" then
 	os.remove("./compile_commands.json")
+	os.rmdir("./.vs")
 	os.remove("./Minecraft.sln")
 	os.remove("./Makefile")
 	os.rmdir("./compile_commands/")
 	os.rmdir("./bin/")
 	os.rmdir("./bin-int/")
+	os.remove("./Minecraft/Makefile")
+	os.remove("./Minecraft/Minecraft.vcxproj")
+	os.remove("./Minecraft/Minecraft.vcxproj.user")
+	os.remove("./Minecraft/imgui.ini")
+	os.remove("./Engine/Engine.vcxproj")
+	os.remove("./Engine/Engine.vcxproj.filters")
+	os.remove("./Engine/Makefile")
+	os.rmdir("./Engine/vendor/GLFW/bin/")
+	os.rmdir("./Engine/vendor/GLFW/bin-int/")
+	os.remove("./Engine/vendor/GLFW/GLFW.vcxproj")
+	os.remove("./Engine/vendor/GLFW/GLFW.vcxproj.filters")
+	os.remove("./Engine/vendor/GLFW/Makefile")
+	os.rmdir("./Engine/vendor/Glad/bin/")
+	os.rmdir("./Engine/vendor/Glad/bin-int/")
+	os.remove("./Engine/vendor/Glad/Glad.vcxproj")
+	os.remove("./Engine/vendor/Glad/Glad.vcxproj.filters")
+	os.remove("./Engine/vendor/Glad/Makefile")
+	os.rmdir("./Engine/vendor/imgui/bin/")
+	os.rmdir("./Engine/vendor/imgui/bin-int/")
+	os.remove("./Engine/vendor/imgui/imgui.vcxproj")
+	os.remove("./Engine/vendor/imgui/imgui.vcxproj.filters")
+	os.remove("./Engine/vendor/imgui/Makefile")
+	os.remove("./Engine/vendor/imgui/imgui.vcxproj")
+	os.remove("./Engine/vendor/imgui/imgui.vcxproj.filters")
 end
