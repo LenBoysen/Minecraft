@@ -10,10 +10,10 @@
 #include "Window.h"
 #include "events/Event.h"
 #include "events/ApplicationEvent.h"
-#include "Renderer/Buffer.h"
 #include "ImGui/ImGuiLayer.h"
+#include "Renderer/Buffer.h"
 #include "Renderer/Shader.h"
-#include "glad/glad.h"
+#include "Renderer/VertexArray.h"
 
 
 
@@ -47,10 +47,9 @@ private:
 	bool m_Running = true;
 	LayerStack m_LayerStack;
 
-	unsigned int m_VertexArray;
-	std::unique_ptr<VertexBuffer> m_VertexBuffer;
-	std::unique_ptr<IndexBuffer> m_IndexBuffer;
-	std::unique_ptr<Shader> m_Shader;
+
+
+
 private:
 	static Application* s_Instace;
 };

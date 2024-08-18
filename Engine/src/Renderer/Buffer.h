@@ -1,6 +1,5 @@
 #pragma once
 #include <glm/glm.hpp>
-#include "Renderer/Renderer.h"
 #include <string>
 #include <vector>
 
@@ -63,9 +62,8 @@ struct BufferElement {
 	uint32_t Size;
 	bool Normalized;
 
-	BufferElement() { }
 	BufferElement(ShaderDataType type, const std::string& name, bool normalized = false)
-		: Name(name), Type(type), Size(ShaderDataTypeSize(type)), Offset(0), Normalized(normalized) {
+		: Name(name), Type(type),  Offset(0), Size(ShaderDataTypeSize(type)), Normalized(normalized) {
 
 	}
 	uint32_t GetComponentCount() const {
@@ -89,11 +87,11 @@ struct BufferElement {
 
 class BufferLayout {
 public:
-	BufferLayout() {}
+	BufferLayout() : m_Stride(0) {}
 
 
 	BufferLayout(const std::initializer_list<BufferElement>& elements)
-		: m_Elements(elements)
+		: m_Elements(elements), m_Stride(0)
 	{
 		CalculateOffsetAndStrid();
 	}

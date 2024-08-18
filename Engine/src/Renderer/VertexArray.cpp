@@ -1,8 +1,12 @@
-#include "Shader.h"
-#include "Platform/OpenGL/OpenGLShader.h"
+#include "VertexArray.h"
+#include "Renderer.h"
 #include <iostream>
+#include "Platform/OpenGL/OpenGLVertexArray.h"
 
-Shader* Shader::Create(const std::string& vertexSrc, const std::string& fragmentSrc)
+
+
+
+VertexArray* VertexArray::Create()
 {
 	switch (RendererAPI::GetAPI()) {
 	case RendererAPI::API::None:
@@ -10,9 +14,8 @@ Shader* Shader::Create(const std::string& vertexSrc, const std::string& fragment
 		return nullptr;
 		break;
 	case RendererAPI::API::OpenGL:
-		return new OpenGLShader(vertexSrc, fragmentSrc);
+		return new OpenGLVertexArray();
 		break;
 	}
 	return nullptr;
-
 }
