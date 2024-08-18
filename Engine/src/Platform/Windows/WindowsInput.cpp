@@ -1,7 +1,7 @@
 #include "WindowsInput.h"
-#include "../Window.h"
+#include "Window.h"
 #include "WindowsWindow.h"
-#include "../Application.h"
+#include "Application.h"
 #include "GLFW/glfw3.h"
 
 

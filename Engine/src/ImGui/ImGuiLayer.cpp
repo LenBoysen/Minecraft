@@ -1,12 +1,12 @@
 #include "ImGuiLayer.h"
 
-#include"../Window.h"
-
+#include"Window.h"
+#include <iostream>
 //Temp
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "../Application.h"
+#include "Application.h"
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
 
@@ -44,6 +44,12 @@ ImGuiLayer::~ImGuiLayer(){
         style.WindowRounding = 0.0f;
         style.Colors[ImGuiCol_WindowBg].w = 1.0f;
     }
+    try {
+        io.Fonts->AddFontFromFileTTF("C:\\Users\\1\\AppData\\Local\\Microsoft\\Windows\\Fonts\\CaskaydiaCoveNerdFont-Regular.ttf", 18.5f, NULL, NULL);
+    }
+    catch(...){
+        std::cerr << "Font could not load";
+    }
 
     // Setup Platform/Renderer backends
     Application& app = Application::Get();
@@ -75,7 +81,7 @@ void ImGuiLayer::end() {
     ImGuiIO& io = ImGui::GetIO();
     Application& app = Application::Get();
     GLFWwindow* window = static_cast<GLFWwindow*>(app.getWindow().GetNativeWindow());
-    io.DisplaySize = ImVec2(app.getWindow().GetWidth(), app.getWindow().GetWidth());
+    io.DisplaySize = ImVec2((float)app.getWindow().GetWidth(), (float)app.getWindow().GetWidth());
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

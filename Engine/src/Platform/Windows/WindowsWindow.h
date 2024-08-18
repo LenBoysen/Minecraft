@@ -1,9 +1,12 @@
 #pragma once
 #include <string>
-#include "../Window.h"
-#include "../events/ApplicationEvent.h"
-#include "../events/KeyEvent.h"
-#include "../events/MouseEvent.h"
+
+#include "WIndow.h"
+
+#include "events/ApplicationEvent.h"
+#include "events/KeyEvent.h"
+#include "events/MouseEvent.h"
+#include "Renderer/GraphicsContext.h"
 
 #include "glfw/glfw3.h"
 #include "glad/glad.h"
@@ -30,6 +33,7 @@ private:
 	virtual void Shutdown();
 private:
 	GLFWwindow* m_Window;
+	GraphicsContext* m_Context;
 
 	struct WindowData
 	{

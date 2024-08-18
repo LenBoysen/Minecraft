@@ -17,6 +17,7 @@ IncludeDir["Glad"] = "Engine/vendor/Glad/include"
 IncludeDir["glm"] = "Engine/vendor/glm"
 IncludeDir["ImGui"] = "Engine/vendor/imgui"
 IncludeDir["Engine"] = "Engine/src"
+IncludeDir["Minecraft"] = "Minecraft/src"
 
 require "vendor/premake-export-compile-commands/export-compile-commands"
 
@@ -29,9 +30,9 @@ project "Engine"
 	location "Engine"
 	kind "StaticLib"
 	language "C++"
-	cppdialect "c++17"
-	staticruntime "off"
-	warnings "off"
+	cppdialect "c++20"
+	staticruntime "on"
+	--warnings "off"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -60,7 +61,8 @@ project "Engine"
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.ImGui}"
+		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.Engine}",
 	}
 
 	links
@@ -85,14 +87,14 @@ project "Engine"
 		}
 
 	filter "system:windows"
-		systemversion "10.0"
+		systemversion "latest"
 
 
 		links
 		{
-			"gdi32", "user32",
-			"shell32", "advapi32",
-			"kernel32", "opengl32",
+			"gdi32", --"user32",
+			--"shell32", "advapi32",
+			--"kernel32", "opengl32",
 		}
 
 
@@ -165,8 +167,8 @@ project "Minecraft"
 	location "Minecraft"
 	kind "ConsoleApp"
 	language "C++"
-	cppdialect "c++17"
-	staticruntime "off"
+	cppdialect "c++20"
+	staticruntime "on"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -185,7 +187,8 @@ project "Minecraft"
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.ImGui}"
+		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.Minecraft}",
 	}
 
 	links
@@ -198,14 +201,14 @@ project "Minecraft"
 
 
 	filter "system:windows"
-		systemversion "10.0"
+		systemversion "latest"
 
 
 		links
 		{
-			"gdi32", "user32",
-			"shell32", "advapi32",
-			"kernel32", "opengl32",
+			"gdi32", --"user32",
+			--"shell32", "advapi32",
+			--"kernel32", "opengl32",
 		}
 
 	filter "action:vs*"
@@ -240,6 +243,7 @@ project "Minecraft"
 			"MC_DIST",
 		}
 		optimize "On"
+
 
 
 

@@ -1,8 +1,8 @@
 project "Glad"
 	kind "StaticLib"
 	language "C"
-	staticruntime "On"
-	warnings "off"
+	staticruntime "on"
+	--warnings "off"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
