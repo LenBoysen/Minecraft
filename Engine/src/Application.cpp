@@ -4,6 +4,25 @@
 
 #define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
 
+
+static GLuint ConvertShaderDataTypeToOpenGL(ShaderDataType type) {
+	switch (type) {
+	case ShaderDataType::Float:	     return GL_FLOAT;
+	case ShaderDataType::Float2:     return GL_FLOAT;
+	case ShaderDataType::Float3:     return GL_FLOAT;
+	case ShaderDataType::Float4:     return GL_FLOAT;
+	case ShaderDataType::Mat3:	     return GL_FLOAT;
+	case ShaderDataType::Mat4:	     return GL_FLOAT;
+	case ShaderDataType::Int:	     return GL_INT;
+	case ShaderDataType::Int2:	     return GL_INT;
+	case ShaderDataType::Int3:	     return GL_INT;
+	case ShaderDataType::Int4:	     return GL_INT;
+	case ShaderDataType::Bool:	     return GL_BOOL;
+	}
+	return 0;
+}
+
+
 Application::~Application() {
 
 	
@@ -32,19 +51,41 @@ Application::Application(const WindowProps& props) {
 	glBindVertexArray(m_VertexArray);
 
 	float vertices[] = {
-		-1.0f, -0.5f, 0.0f,
-		1.0f, -0.5f, 0.0f,
-		0.0f, -1.0f, 0.0f,
-		1.0f, 1.0f, 0.0f
+		-0.5f, -0.5f, 0.0f,   0.7f, 0.8f, 0.2f, 1.0f,
+		0.5f, -0.5f, 0.0f,    0.7f, 0.1f, 0.8f, 1.0f,
+		0.0f, 0.5f, 0.0f,    0.1f, 0.8f, 0.5f, 1.0f,
 	};
 
 	m_VertexBuffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
 	//m_VertexBuffer->Bind();
+	
+	{
 
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, sizeof(vertices)/(3 * sizeof(float)), GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+		BufferLayout layout = {
+			{ShaderDataType::Float3, "a_Position"},
+			{ShaderDataType::Float4, "a_Color"},
 
-	uint32_t indicies[] = { 0, 3, 2, 3, 2, 1};
+		};
+
+		m_VertexBuffer->SetLayout(layout);
+
+	}
+
+	uint32_t index = 0;
+	BufferLayout layout = m_VertexBuffer->GetLayout();
+	for (auto& element : layout) { //m_VertexBuffer->GetLayout()
+		glEnableVertexAttribArray(index);
+		glVertexAttribPointer(index,
+			element.GetComponentCount(),
+			ConvertShaderDataTypeToOpenGL(element.Type),
+			element.Normalized ? GL_TRUE : GL_FALSE,
+			layout.getStride(),
+			(void*)element.Offset);
+		index++;
+	}
+
+
+	uint32_t indicies[] = { 0, 1, 2};
 	m_IndexBuffer.reset(IndexBuffer::Create(indicies, sizeof(indicies) / sizeof(uint32_t)));
 	//m_IndexBuffer->Bind();
 
@@ -53,11 +94,12 @@ Application::Application(const WindowProps& props) {
 		#version 460 core
 		
 		layout(location = 0) in vec3 a_Position;
+		layout(location = 1) in vec4 a_Color;
 		
-		out vec3 v_Position;
+		out vec4 v_Color;
 
 		void main(){
-			v_Position = a_Position;
+			v_Color = a_Color;
 			gl_Position = vec4(a_Position, 1.0);
 		}
 	)";
@@ -66,10 +108,11 @@ Application::Application(const WindowProps& props) {
 		
 		layout(location = 0) out vec4 color;
 
-		in vec3 v_Position;
+		in vec4 v_Color;
 
 		void main(){
-			color = vec4(v_Position, 1.0);
+			//color = vec4(v_Position, 1.0);
+			color = v_Color;
 		}
 	)";
 

@@ -8,3 +8,4 @@ Makefile
 /Engine/vendor/Glad/bin-int/
 Engine/vendor/Glad/bin/
 Engine/imgui.ini
+Minecraft/imgui.ini
