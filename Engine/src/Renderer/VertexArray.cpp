@@ -8,7 +8,7 @@
 
 VertexArray* VertexArray::Create()
 {
-	switch (RendererAPI::GetAPI()) {
+	switch (Renderer::GetAPI()) {
 	case RendererAPI::API::None:
 		std::cerr << "No Renderer API selected" << std::endl;
 		return nullptr;

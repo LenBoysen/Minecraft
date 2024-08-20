@@ -2,6 +2,7 @@
 
 
 #include "Renderer/Renderer.h"
+#include "GLFW/glfw3.h"
 
 
 #define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
@@ -44,8 +45,11 @@ void Application::run() {
 	
 	while (m_Running)
 	{
+		float time = (float) glfwGetTime(); //Platform::GetTime()
+		TimeStep timestep = time - m_LastFrameTime;
+		m_LastFrameTime = time;
 		for(Layer* layer : m_LayerStack)
-			layer->onUpdate();
+			layer->onUpdate(timestep);
 
 		((ImGuiLayer*)m_ImGuiLayer)->begin();
 		for (Layer* layer : m_LayerStack)
@@ -58,17 +62,6 @@ void Application::run() {
 
 
 
-//void Application::onEvent(Event & event){
-//	EventDispatcher dispatcher(event);
-//	dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(onWindowClose));
-//	
-//	for(auto it = m_LayerStack.end(); it != m_LayerStack.begin()){
-//		(*--it).OnEvent(e);
-//		if(e.Handled)
-//			brake;
-//}
-
-
 void Application::pushLayer(Layer*layer){
 	m_LayerStack.PushLayer(layer);
 }
@@ -76,8 +69,7 @@ void Application::pushOverlay(Layer* layer){
 	m_LayerStack.PushOverlay(layer);
 }
 
-void Application::onEvent(Event& e)
-{
+void Application::onEvent(Event& e){
 	EventDispatcher dispatcher(e);
 	dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClose));
 

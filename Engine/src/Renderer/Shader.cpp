@@ -1,10 +1,12 @@
 #include "Shader.h"
 #include "Platform/OpenGL/OpenGLShader.h"
 #include <iostream>
+#include "Renderer/Renderer.h"
+#include "Renderer/RendererAPI.h"
 
 Shader* Shader::Create(const std::string& vertexSrc, const std::string& fragmentSrc)
 {
-	switch (RendererAPI::GetAPI()) {
+	switch (Renderer::GetAPI()) {
 	case RendererAPI::API::None:
 		std::cerr << "No Renderer API selected" << std::endl;
 		return nullptr;
@@ -16,3 +18,5 @@ Shader* Shader::Create(const std::string& vertexSrc, const std::string& fragment
 	return nullptr;
 
 }
+
+

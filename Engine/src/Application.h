@@ -14,7 +14,7 @@
 #include "Renderer/Buffer.h"
 #include "Renderer/Shader.h"
 #include "Renderer/VertexArray.h"
-
+#include "Core/TimeStep.h"
 
 
 class Application {
@@ -41,7 +41,8 @@ public:
 
 private:
 	bool OnWindowClose(WindowCloseEvent& e);
-
+private:
+	float m_LastFrameTime;
 	std::unique_ptr<Window> m_Window;
 	ImGuiLayer* m_ImGuiLayer;
 	bool m_Running = true;
