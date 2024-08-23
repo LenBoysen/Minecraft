@@ -1,14 +1,14 @@
 #pragma once
 #include <string>
 
-#include "WIndow.h"
+#include "Window.h"
 
 #include "events/ApplicationEvent.h"
 #include "events/KeyEvent.h"
 #include "events/MouseEvent.h"
 #include "Renderer/GraphicsContext.h"
 
-#include "glfw/glfw3.h"
+#include "GLFW/glfw3.h"
 #include "glad/glad.h"
 #include <cassert>
 

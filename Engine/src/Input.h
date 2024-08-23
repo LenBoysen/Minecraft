@@ -13,6 +13,8 @@ public:
 	inline static std::pair<float, float> getMousePosition() { return s_Instance->getMousePositionImpl(); }
 	inline static float getMouseX() { return s_Instance->getMouseXImpl(); }
 	inline static float getMouseY() { return s_Instance->getMouseYImpl(); }
+	inline static void setMousePosition(int x, int y) { s_Instance->setMousePositionImpl(x, y); }
+	inline static void setHideCursor(bool hide) { s_Instance->setHideCursorImpl(hide); }
 
 
 protected:
@@ -22,6 +24,8 @@ protected:
 	virtual std::pair<float, float> getMousePositionImpl() = 0;
 	virtual float getMouseXImpl() = 0;
 	virtual float getMouseYImpl() = 0;
+	virtual void setMousePositionImpl(int x, int y) = 0;
+	virtual void setHideCursorImpl(bool hide) = 0;
 
 private:
 	static Input* s_Instance;

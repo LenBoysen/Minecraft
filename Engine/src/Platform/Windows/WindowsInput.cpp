@@ -41,3 +41,15 @@ float WindowsInput::getMouseYImpl() {
 	return y;
 }
 
+void WindowsInput::setMousePositionImpl(int x, int y)
+{
+	GLFWwindow* window = static_cast<GLFWwindow*>(Application::Get().getWindow().GetNativeWindow());
+	glfwSetCursorPos(window, x, y);
+}
+
+void WindowsInput::setHideCursorImpl(bool hide)
+{
+	GLFWwindow* window = static_cast<GLFWwindow*>(Application::Get().getWindow().GetNativeWindow());
+	glfwSetInputMode(window, GLFW_CURSOR, hide ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+}
+

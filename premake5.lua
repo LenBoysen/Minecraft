@@ -16,15 +16,17 @@ IncludeDir["GLFW"] = "Engine/vendor/GLFW/include"
 IncludeDir["Glad"] = "Engine/vendor/Glad/include"
 IncludeDir["glm"] = "Engine/vendor/glm"
 IncludeDir["ImGui"] = "Engine/vendor/imgui"
+IncludeDir["stb_image"] = "Engine/vendor/stb_image"
 IncludeDir["Engine"] = "Engine/src"
 IncludeDir["Minecraft"] = "Minecraft/src"
 
 require "vendor/premake-export-compile-commands/export-compile-commands"
 
-include "Engine/vendor/GLFW"
-include "Engine/vendor/Glad"
-include "Engine/vendor/imguiPremake"
-
+group "Dependencies"
+	include "Engine/vendor/GLFW"
+	include "Engine/vendor/Glad"
+	include "Engine/vendor/imguiPremake"
+group ""
 
 project "Engine"
 	location "Engine"
@@ -52,6 +54,8 @@ project "Engine"
 
 		"%{prj.name}/src/**.h",
 		"%{prj.name}/src/**.cpp",
+		"%{prj.name}/vendor/stb_image/**.h",
+		"%{prj.name}/vendor/stb_image/**.cpp",
 
 	}
 
@@ -62,6 +66,7 @@ project "Engine"
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.stb_image}",
 		"%{IncludeDir.Engine}",
 	}
 
@@ -188,6 +193,7 @@ project "Minecraft"
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.stb_image}",
 		"%{IncludeDir.Minecraft}",
 	}
 

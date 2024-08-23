@@ -13,5 +13,7 @@ protected:
 	virtual std::pair<float, float> getMousePositionImpl() override;
 	virtual float getMouseXImpl() override;
 	virtual float getMouseYImpl() override;
+	virtual void setMousePositionImpl(int x, int y) override;
+	virtual void setHideCursorImpl(bool hide) override;
 };
 

@@ -1,5 +1,7 @@
 #pragma once
 
+
+
 #include <cassert>
 #include <string>
 #include <iostream>
@@ -15,6 +17,8 @@
 #include "Renderer/Shader.h"
 #include "Renderer/VertexArray.h"
 #include "Core/TimeStep.h"
+#include "Core.h"
+
 
 
 class Application {
@@ -37,19 +41,25 @@ public:
 
 
 	inline static Application& Get() { return *s_Instace; }
-	inline Window& getWindow(){ return *m_Window; }
+	inline Window& getWindow() { return *m_Window; }
+	inline ShaderLibrary& getShaderLibrary() { return shaderLibrary; }
 
 private:
 	bool OnWindowClose(WindowCloseEvent& e);
+	bool OnWindowResize(WindowResizeEvent& e);
 private:
 	float m_LastFrameTime;
-	std::unique_ptr<Window> m_Window;
+	Scope<Window> m_Window;
 	ImGuiLayer* m_ImGuiLayer;
 	bool m_Running = true;
+	bool m_Minimized = false;
 	LayerStack m_LayerStack;
 
 
 
+
+protected:
+	ShaderLibrary shaderLibrary;
 
 private:
 	static Application* s_Instace;

@@ -1,11 +1,10 @@
 #include "Application.h"
-
+#include "eginc.h"
 
 #include "Renderer/Renderer.h"
 #include "GLFW/glfw3.h"
 
 
-#define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
 
 
 
@@ -26,11 +25,16 @@ Application::Application() : Application(WindowProps("Engine", 1280, 700))
 
 
 Application::Application(const WindowProps& props) {
+	
 	s_Instace = this;
 	std::cout << "Application constructing." << std::endl;
 
-	m_Window = std::unique_ptr<Window>(Window::Create(props));
-	m_Window->SetEventCallback(BIND_EVENT_FN(onEvent));
+	m_Window = Scope<Window>(Window::Create(props));
+	m_Window->SetEventCallback(BIND_EVENT_FN(Application::onEvent));
+
+
+	Renderer::Init();
+
 
 	m_ImGuiLayer = new ImGuiLayer();
 	pushOverlay(m_ImGuiLayer);
@@ -48,9 +52,10 @@ void Application::run() {
 		float time = (float) glfwGetTime(); //Platform::GetTime()
 		TimeStep timestep = time - m_LastFrameTime;
 		m_LastFrameTime = time;
-		for(Layer* layer : m_LayerStack)
-			layer->onUpdate(timestep);
-
+		if (!m_Minimized) {
+			for (Layer* layer : m_LayerStack)
+				layer->onUpdate(timestep);
+		}
 		((ImGuiLayer*)m_ImGuiLayer)->begin();
 		for (Layer* layer : m_LayerStack)
 			layer->onImGuiRender();
@@ -70,8 +75,9 @@ void Application::pushOverlay(Layer* layer){
 }
 
 void Application::onEvent(Event& e){
-	EventDispatcher dispatcher(e);
-	dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClose));
+	EventDispatcher dispatcher(e); 
+	dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::OnWindowClose));
+	dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(Application::OnWindowResize));
 
 	for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
 	{
@@ -87,5 +93,18 @@ bool Application::OnWindowClose(WindowCloseEvent & e)
 {
 	m_Running = false;
 	return true;
+}
+
+bool Application::OnWindowResize(WindowResizeEvent& e)
+{
+	if (e.GetWidth() == 0 || e.GetHeight() == 0) {
+		m_Minimized = true;
+		return false;
+	}
+	m_Minimized = false;
+	
+	Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
+
+	return false;
 }
 

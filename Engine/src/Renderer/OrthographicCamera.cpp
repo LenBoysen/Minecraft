@@ -11,7 +11,7 @@ OrthographicCamera::OrthographicCamera(float left, float right, float bottom, fl
 void OrthographicCamera::CalculateViewMatrix()
 {
 	glm::mat4 transform = glm::translate(glm::mat4(1.0f), m_Position) *
-						  glm::rotate(glm::mat4(1), glm::radians(m_Rotation), glm::vec3(0, 0, 1));
+						  glm::rotate(glm::mat4(1), glm::radians(m_Rotation), glm::vec3(0, 1, 0));
 
 	m_ViewMatrix = glm::inverse(transform);
 

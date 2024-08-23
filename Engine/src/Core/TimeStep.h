@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 class TimeStep {
 public:
@@ -11,3 +12,16 @@ public:
 private:
 	float m_Time;
 };
+
+class DebugTimer {
+public:
+	DebugTimer(const std::string& description);
+	~DebugTimer();
+
+private:
+	float m_StartTime;
+	std::string m_Description;
+};
+
+
+

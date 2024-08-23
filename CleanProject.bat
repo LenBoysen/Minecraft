@@ -1,2 +1,4 @@
 CALL vendor\bin\premake5.exe clean
-PAUSE
+IF %ERRORLEVEL% NEQ 0 (
+  PAUSE
+)
