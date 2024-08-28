@@ -14,9 +14,11 @@ public:
 	void GenerateWorld();
 	void GenerateChunk(glm::ivec2);
 	void Render();
+	void SetBlock(BlockType type, glm::ivec3 pos);
 
+	std::vector<glm::ivec3> CastRay(const glm::vec3 param1, const glm::vec3 param2, uint32_t blockLength = 16);
 private:
-	bool Exists(glm::ivec2 chunckPos);
+	bool Exists(glm::ivec2 chunckPos) const;
 
 private:
 	struct vec2_hash {

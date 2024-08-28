@@ -1,6 +1,7 @@
 #include "WindowsWindow.h"
 #include<string>
 #include "Platform/OpenGL/OpenGLContext.h"
+#include "stb_image.h"
 
 
 
@@ -170,4 +171,12 @@ void WindowsWindow::SetVSync(bool enabled)
 bool WindowsWindow::IsVSync() const
 {
 	return m_Data.VSync;
+}
+
+void WindowsWindow::SetIcon(const std::string& filePath) const
+{
+	GLFWimage images[1];
+	images[0].pixels = stbi_load(filePath.c_str(), &images[0].width, &images[0].height, 0, 4); //rgba channels 
+	glfwSetWindowIcon(m_Window, 1, images);
+	stbi_image_free(images[0].pixels);
 }

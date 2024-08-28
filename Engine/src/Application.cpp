@@ -31,7 +31,7 @@ Application::Application(const WindowProps& props) {
 
 	m_Window = Scope<Window>(Window::Create(props));
 	m_Window->SetEventCallback(BIND_EVENT_FN(Application::onEvent));
-
+	
 
 	Renderer::Init();
 

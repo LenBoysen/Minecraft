@@ -32,7 +32,7 @@ uniform int u_TexMode;
 uniform vec2 u_SideTexture;
 uniform vec2 u_TopTexture;
 uniform vec2 u_BotTexture;
-uniform vec2 u_MultColorCoord;
+uniform vec4 u_GrasMultColor;
 
 void main(){
 	
@@ -47,35 +47,10 @@ void main(){
 	float y;
 	vec2 TexCoord;
 	vec4 multColor = vec4(1.0f);
-	switch(u_TexMode){
-		case 0:
-			x = u_SideTexture.x;
-			y = u_SideTexture.y;
-			break;
-		case 1:
-			if(int(round(v_FaceId)) == 4){
-				x = u_TopTexture.x;
-				y = u_TopTexture.y;
-				multColor = vec4(0.28f, 0.8f, 0.2f, 1f);//(u_Texture,  u_MultColorCoord);//vec4(0.15f, 0.6f, 0.05f, 1.0f);
-			} else{
-			x = u_SideTexture.x;
-			y = u_SideTexture.y;
-			}
-
-			break;
-		case 2:
-			x = 6.0f;
-			y = 13.0;
-			break;
-		case 3:
-			x = 6.0f;
-			y = 13.0;
-			break;
-		default:
-			x = 6.0f;
-			y = 13.0;
-			break;
+	if(int(v_TexCoord.x) == 0 && int(v_TexCoord.y) == 0 ){
+		multColor = u_GrasMultColor;
 	}
-	color = texture(u_Texture, v_TexCoord * (1/16.0f) + vec2((x+0.0f)/16.0f, (-y+15.0f)/16.0f)) * multColor;
+	
+	color = texture(u_Texture, vec2(v_TexCoord.x, 16.0f - v_TexCoord.y) * (1/16.0f)) * multColor;
 
 }

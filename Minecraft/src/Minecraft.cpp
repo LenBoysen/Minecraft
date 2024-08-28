@@ -11,6 +11,7 @@
 #include "Renderer/CameraOperator.h"
 #include "events/KeyEvent.h"
 #include "World.h"
+#include "events/MouseEvent.h"
 
 class Minecraft3DLayer : public Layer {
 public:
@@ -237,8 +238,8 @@ public:
 
 		m_Camera.reset(new PerspectiveCamera(45.0f, 1.6f + 1.6f, 0.9f + 0.9f, 0.01f, 850.0f));
 
-		m_Camera->SetPosition({ 0.0f, 5.0f, 0.0f });
-		m_Camera->SetRotation({ -60.0f, 0.0f, 0.0f });
+		m_Camera->SetPosition({ 0.0f, 6.0f, 0.0f });
+		m_Camera->SetRotation({ 0.0f, 0.0f, 0.0f });
 
 		m_CameraOperator.reset(new CameraOperator(m_Camera));
 		Window& window = Application::Get().getWindow();
@@ -249,6 +250,18 @@ public:
 
 		world.reset(new World());
 		world->GenerateWorld();
+		for (int i = 0; i < 4; i++) {
+			world->SetBlock(BlockType::Obsidian, { 0 + i, 4, 0 });
+		}
+		for (int i = 0; i < 4; i++) {
+			world->SetBlock(BlockType::Obsidian, { 0 + i, 8, 0 });
+		}
+		for (int i = 0; i < 4; i++) {
+			world->SetBlock(BlockType::Obsidian, { 0, 4 + i, 0 });
+		}
+		for (int i = 0; i < 4; i++) {
+			world->SetBlock(BlockType::Obsidian, { 3, 4 + i, 0 });
+		}
 	}
 	virtual void onDetach() override {
 
@@ -312,51 +325,28 @@ public:
 		Input::setMousePosition(windowMiddlePosition.x, windowMiddlePosition.y);
 		m_CameraOperator->MoveCamera(movement);
 	}
-		//MaterialRef material = new Material(m_FlatColorShader);
-		//MaterialInstanceRef mi = new MaterialInstance(material);
-		//material->SetValue("u_Color", redColor);
-		//material->SetTexture("u_Albedo", texture);
-		//Mesh squareMesh = new Mesh(Vertecies, Indecies); 
-		//squareMesh->SetMaterial(material);
 
 		RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 		RenderCommand::Clear();
 
 		
 
-		//m_Texture->Bind();
 
 		Renderer::BeginScene(m_Camera);
-		for (int x = 0; x < 20; x ++)
-		{
-			for (int y = 0; y < 20; y++)
-			{
-
-				//Renderer::Submit(squareMesh, transform);
-
-				//glm::mat4 transform = glm::rotate(glm::translate(glm::scale(glm::mat4(1.0f), glm::vec3(1.0)), { x*1.0f, -2.0f, y*1.0f-20.0f }), glm::radians(0.0f), { 0.0f, 0.0f, 1.0f });
-				//Renderer::Submit(m_textureShader, m_SquareVA, transform);
-			}
-		}
-		//Renderer::Submit(m_textureShader, m_SquareVA, glm::rotate(glm::translate(glm::scale(glm::mat4(1.0f), glm::vec3(1.0)), { 22.0f, -1.0f, -2.0f }), glm::radians(0.0f), { 0.0f, 0.0f, 1.0f }));
-		//Renderer::Submit(m_textureShader, m_SquareVA, glm::rotate(glm::translate(glm::scale(glm::mat4(1.0f), glm::vec3(1.0)), { 21.0f, 0.0f, -3.0f }), glm::radians(0.0f), { 0.0f, 0.0f, 1.0f }));
-		//Renderer::Submit(m_textureShader, m_SquareVA, glm::rotate(glm::translate(glm::scale(glm::mat4(1.0f), glm::vec3(1.0)), { 20.0f, 1.0f, -4.0f }), glm::radians(0.0f), { 0.0f, 0.0f, 1.0f }));
 		world->Render();
 		Renderer::EndScene();
 	}
 	virtual void onEvent(Event& e) override {
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FN(Minecraft3DLayer::ToggleEscMenu));
+		dispatcher.Dispatch<MouseButtonPressedEvent>(BIND_EVENT_FN(Minecraft3DLayer::MouseClick));
 
-		//if (Input::isKeyPressed(EG_KEY_ESCAPE)) {
-		//	escMenu ^= true;
-		//}
 	}
 	virtual void onImGuiRender() override {
 		ImGui::Begin("Debug");
 		ImGui::Text("FPS: %f", ImGui::GetIO().Framerate); 
 		ImGui::Checkbox("Escape Menu", &escMenu);
-		ImGui::Text("Rotation: %f", rotation);
+		ImGui::Text("Position: x:%f y:%f z:%f ", m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z );
 		ImGui::SliderFloat("Scale", &scale, 0.0f, 1.0f);
 		ImGui::SliderFloat("Rotation", &rotation, 0.0f, 360.0f); 
 		ImGui::SliderFloat("Movement Speed", &movementSpeed, 0.0f, 100.0f);
@@ -374,7 +364,19 @@ private:
 		}
 		return false;
 	}
-	
+	bool MouseClick(MouseButtonEvent& e) {
+		if (escMenu)
+			return false;
+		std::vector<glm::ivec3> rayBlocks =  world->CastRay(m_Camera->GetPosition(), m_Camera->GetRotation());
+
+		if (e.GetMouseButton() == EG_MOUSE_BUTTON_LEFT)
+			world->SetBlock(BlockType::None, rayBlocks.end()[-1]);
+			
+		if (e.GetMouseButton() == EG_MOUSE_BUTTON_RIGHT)
+			world->SetBlock(BlockType::Obsidian, rayBlocks.end()[-2]);
+
+		return false;
+	}
 private: 
 	std::shared_ptr<Shader> m_Shader;
 	std::shared_ptr<VertexArray> m_VertexArray;
@@ -401,6 +403,7 @@ private:
 
 	glm::vec3 squareColor = { 70 / 255.0f, 34 / 255.0f, 118 / 255.0f };
 	glm::ivec2 texture = { 2.0f, 2.0f };
+	unsigned int index = 0;
 };
 
 
@@ -409,7 +412,11 @@ class Minecraft : public Application {
 public:
 	Minecraft() : Application(WindowProps("Minecraft", 1920, 1080)) {
 		getWindow().SetVSync(false);
+		getWindow().SetIcon("assets/textures/logo.png");
 		pushLayer(new Minecraft3DLayer);
+
+
+
 	}
 
 	~Minecraft() {

@@ -9,3 +9,4 @@ Makefile
 Engine/vendor/Glad/bin/
 Engine/imgui.ini
 Minecraft/imgui.ini
+Minecraft/assets/realminecraft/
