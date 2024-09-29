@@ -9,6 +9,10 @@
 #include <thread>
 #include <future>
 #include <tuple>
+#include "FastNoise/FastNoise.h"
+#include "FastSIMD/FastSIMD.h"
+#include <mutex>
+
 
 Chunk::Chunk(glm::ivec2 chunkPosition)
 	: m_ChunkPosition(chunkPosition)
@@ -32,19 +36,8 @@ Chunk::Chunk(glm::ivec2 chunkPosition)
 	std::dynamic_pointer_cast<OpenGLShader>(m_ChunkTextureShader)->UploadUniformInt("u_Texture", 0);
 	std::dynamic_pointer_cast<OpenGLShader>(m_ChunkTextureShader)->UploadUniformFloat4("u_GrasMultColor", glm::vec4({ 0.35f, 0.78f, 0.29f, 1 }));
 	//GenerateIsles();
-	for (int z = 0; z < 16; z++) {
-		for (int y = 0; y < 512; y++) {
-			for (int x = 0; x < 16; x++) {
-
-				if (y == 0)				blocks[x + 256 * y + 16 * z] = BlockType::Bedrock;
-				else if (y > 0 && y < 3)	blocks[x + 256 * y + 16 * z] = BlockType::Dirt;
-				else if (y == 3)		blocks[x + 256 * y + 16 * z] = BlockType::Grass;
-				else					blocks[x + 256 * y + 16 * z] = BlockType::None;
-
-			}
-		}
-	}
-	asyncTask = std::async(std::launch::async, &Chunk::GenereateRenderData, this);
+	
+	
 
 	//SetFutureRet(&ret);
 	//ret.wait();
@@ -57,31 +50,35 @@ Chunk::Chunk(glm::ivec2 chunkPosition)
 
 }
 
-std::shared_ptr<Chunk> Chunk::Generate(glm::ivec2 chunkPosition)
-{
-	return std::make_shared<Chunk>(chunkPosition);
+std::shared_ptr<Chunk> Chunk::AsyncGenerate() {
+	return AsyncGenerate(m_ChunkPosition);
+}
+std::shared_ptr<Chunk> Chunk::AsyncGenerate(glm::ivec2 chunkPosition){
+	Chunk* chunk = new Chunk(chunkPosition);
+	chunk->m_IsCalculatingRenderData = true;
+	chunk->asyncChunkGenerationTask = std::async(std::launch::async, &Chunk::AsyncGenereateChunk, chunk);
+	return std::shared_ptr<Chunk>(chunk);
 }
 
 
 
 void Chunk::Render()
 {
-	
+	//std::cout << TimeStep::GetTime() << " - Render Chunk: x:" << m_ChunkPosition.x << " y:" << m_ChunkPosition.y << std::endl;
 	if (!m_ReadyToRender) {
-		if (m_WorldGenDone) {
+		if (m_BuffersExists) {
+			assert(m_vertecies);
+			assert(m_indecies);
 			sendIsleToRenderer();
-			m_ReadyToRender = true;
-			m_FallbackExists = true;
+			m_IsCalculatingRenderData = false;
 		}
 		else {
-			if (!m_FallbackExists) {
+			if (!m_FallbackVA)
 				return;
-			}
-			else {
-			}
+			
 		}
 	}
-
+	std::dynamic_pointer_cast<OpenGLShader>(m_ChunkTextureShader)->UploadUniformInt("u_Texture", 0);
 	glm::mat4 transfrom = glm::translate(glm::mat4(1.0f), { m_ChunkPosition.x * 16, 0.0f , m_ChunkPosition.y * 16 });
 	Renderer::Submit(m_ChunkTextureShader, m_ChunkVA, transfrom);
 }
@@ -94,13 +91,18 @@ void Chunk::SetBlock(BlockType type, glm::ivec3 pos)
 	if (m_ReadyToRender) {
 		m_ReadyToRender = false;
 		m_WorldGenDone = false;
+		ResetBuffer();
+		assert(asyncTask.valid());
 		asyncTask = std::async(std::launch::async, &Chunk::GenereateRenderData, this);
 		
 	}
 	else {
 		if (m_WorldGenDone) {
-			asyncTask = std::async(std::launch::async, &Chunk::GenereateRenderData, this);
+			ResetBuffer();
 			m_WorldGenDone = false;
+			m_ReadyToRender = false;
+			assert(asyncTask.valid());
+			asyncTask = std::async(std::launch::async, &Chunk::GenereateRenderData, this);
 		}
 		else {
 			m_WorldGenHotReload = true;
@@ -110,12 +112,85 @@ void Chunk::SetBlock(BlockType type, glm::ivec3 pos)
 
 }
 
+bool Chunk::IsLoaded() const
+{
+	return m_BuffersExists;
+	//return m_ReadyToRender;
+}
+
+bool Chunk::IsCalculatingRenderData() const
+{
+	return m_IsCalculatingRenderData;
+}
+
+void Chunk::GenereateChunk() {
+	std::cout << TimeStep::GetTime() << " - Generate Chunk: x:" << m_ChunkPosition.x << " z: " << m_ChunkPosition.y << std::endl;
+	FastNoise::SmartNode<> fastnoise;
+	fastnoise = FastNoise::New<FastNoise::Perlin>(FastSIMD::eLevel::Level_AVX512);
+
+	std::vector<float> noiseMap(16 * 16);
+	//noiseMap.reserve(16 * 16);
+	fastnoise->GenUniformGrid2D(noiseMap.data(), m_ChunkPosition.x * 16, m_ChunkPosition.y * 16, 16, 16, 0.0052587890625f, 0);
+	for (int x = 0; x < 16; x++) {
+		for (int z = 0, height = 0; z < 16; z++) {
+			height = 256 + noiseMap[x + 16 * z] * 32;
+			for (int y = 0; y < 512; y++) {
+				if (y == 0)							blocks[x + 256 * y + 16 * z] = BlockType::Bedrock;
+				else if (y > 0 && y < height)		blocks[x + 256 * y + 16 * z] = BlockType::Dirt;
+				else if (y == height)				blocks[x + 256 * y + 16 * z] = BlockType::Grass;
+				else								blocks[x + 256 * y + 16 * z] = BlockType::None;
+
+			}
+		}
+	}
+	m_WorldGenDone = true;
+	m_FallbackExists = true;
+}
+
+void Chunk::SyncGenereateChunk() {
+	m_WorldGenDone = false;
+	m_IsCalculatingRenderData = true;
+	m_ReadyToRender = false;
+	m_WorldGenHotReload = false;
+	GenereateChunk();
+	GenereateRenderData();
+}
+
+void Chunk::AsyncGenereateChunk(){
+	m_WorldGenDone = false;
+	m_IsCalculatingRenderData = true;
+	m_ReadyToRender = false;
+	m_WorldGenHotReload = false;
+	GenereateChunk();
+	asyncTask = std::async(std::launch::async, &Chunk::GenereateRenderData, this);
+}
+
+void Chunk::AsyncReloadChunk() {
+
+	if (m_IsCalculatingRenderData)
+		return;
+
+	std::cout << TimeStep::GetTime() << " - Reload Chunk: x:" << m_ChunkPosition.x << " z: " << m_ChunkPosition.y << std::endl;
+	m_IsCalculatingRenderData = true;
+	if (m_FallbackExists)
+		asyncTask = std::async(std::launch::async, &Chunk::GenereateRenderData, this);
+	else
+		asyncChunkGenerationTask = std::async(std::launch::async, &Chunk::AsyncGenereateChunk, this);
+}
+
+void Chunk::ResetBuffer() {
+	m_BuffersExists = false;
+	m_vertecies.reset(new std::vector<float>);
+	m_indecies.reset(new std::vector<uint32_t>);
+}
+
 void Chunk::GenereateRenderData() {
+	m_IsCalculatingRenderData = true;
+
 	unsigned int index = 0;
 	glm::vec2 texCoord;
-	m_vertecies.reset(new std::vector<float>);
+	ResetBuffer();
 	m_vertecies->reserve(16 * 16 * 512);
-	m_indecies.reset(new std::vector<uint32_t>);
 	for (glm::ivec3 pos = { 0,0,0 }; pos.z < 16;) {
 		for (; pos.y < 512;) {
 			for (; pos.x < 16;) {
@@ -146,60 +221,60 @@ void Chunk::GenereateRenderData() {
 
 					if (blockPX == BlockType::None) {
 						texCoord = sideTexCoord;
-						m_vertecies->insert(m_vertecies->end(), { (float)pos.x + 1, (float)pos.y,     (float)pos.z,		(float)texCoord.x + 1,	(float)texCoord.y + 1,
-																	(float)pos.x + 1, (float)pos.y + 1, (float)pos.z + 1,	(float)texCoord.x,		(float)texCoord.y,
-																	(float)pos.x + 1, (float)pos.y,     (float)pos.z + 1,	(float)texCoord.x,		(float)texCoord.y + 1,
-																	(float)pos.x + 1, (float)pos.y + 1, (float)pos.z,		(float)texCoord.x + 1,	(float)texCoord.y,
+						m_vertecies->insert(m_vertecies->end(), {	(float)pos.x + 1,	(float)pos.y,		(float)pos.z,		(float)texCoord.x + 1,	(float)texCoord.y + 1,	(float)1, (float)0, (float)0,
+																	(float)pos.x + 1,	(float)pos.y + 1,	(float)pos.z + 1,	(float)texCoord.x,		(float)texCoord.y,		(float)1, (float)0, (float)0,
+																	(float)pos.x + 1,	(float)pos.y,		(float)pos.z + 1,	(float)texCoord.x,		(float)texCoord.y + 1,	(float)1, (float)0, (float)0,
+																	(float)pos.x + 1,	(float)pos.y + 1,	(float)pos.z,		(float)texCoord.x + 1,	(float)texCoord.y,		(float)1, (float)0, (float)0,
 							});
 						m_indecies->insert(m_indecies->end(), { index, index + 1, index + 2, index, index + 3, index + 1 });
 						index += 4;
 					}
 					if (blockNX == BlockType::None) {
 						texCoord = sideTexCoord;
-						m_vertecies->insert(m_vertecies->end(), { (float)pos.x, (float)pos.y,     (float)pos.z,			(float)texCoord.x,		(float)texCoord.y + 1,
-																	(float)pos.x, (float)pos.y + 1, (float)pos.z + 1,		(float)texCoord.x + 1,	(float)texCoord.y,
-																	(float)pos.x, (float)pos.y,     (float)pos.z + 1,		(float)texCoord.x + 1,	(float)texCoord.y + 1,
-																	(float)pos.x, (float)pos.y + 1, (float)pos.z,			(float)texCoord.x,		(float)texCoord.y,
+						m_vertecies->insert(m_vertecies->end(), {	(float)pos.x,		(float)pos.y,		(float)pos.z,		(float)texCoord.x,		(float)texCoord.y + 1,	(float)-1,(float)0, (float)0,
+																	(float)pos.x,		(float)pos.y + 1,	(float)pos.z + 1,	(float)texCoord.x + 1,	(float)texCoord.y,		(float)-1,(float)0, (float)0,
+																	(float)pos.x,		(float)pos.y,		(float)pos.z + 1,	(float)texCoord.x + 1,	(float)texCoord.y + 1,	(float)-1,(float)0, (float)0,
+																	(float)pos.x,		(float)pos.y + 1,	(float)pos.z,		(float)texCoord.x,		(float)texCoord.y,		(float)-1,(float)0, (float)0,
 							});
 						m_indecies->insert(m_indecies->end(), { index, index + 1, index + 2, index, index + 3, index + 1 });
 						index += 4;
 					}
 					if (blockPY == BlockType::None) {
 						texCoord = topTexCoord;
-						m_vertecies->insert(m_vertecies->end(), { (float)pos.x,    (float)pos.y + 1, (float)pos.z,		(float)texCoord.x + 1,	(float)texCoord.y + 1,
-																	(float)pos.x + 1,(float)pos.y + 1, (float)pos.z + 1,	(float)texCoord.x,		(float)texCoord.y,
-																	(float)pos.x,    (float)pos.y + 1, (float)pos.z + 1,	(float)texCoord.x,		(float)texCoord.y + 1,
-																	(float)pos.x + 1,(float)pos.y + 1,  (float)pos.z,		(float)texCoord.x + 1,	(float)texCoord.y,
+						m_vertecies->insert(m_vertecies->end(), { (float)pos.x,			(float)pos.y + 1,	(float)pos.z,		(float)texCoord.x + 1,	(float)texCoord.y + 1,	(float)0, (float)1, (float)0,
+																	(float)pos.x + 1,	(float)pos.y + 1,	(float)pos.z + 1,	(float)texCoord.x,		(float)texCoord.y,		(float)0, (float)1, (float)0,
+																	(float)pos.x,		(float)pos.y + 1,	(float)pos.z + 1,	(float)texCoord.x,		(float)texCoord.y + 1,	(float)0, (float)1, (float)0,
+																	(float)pos.x + 1,	(float)pos.y + 1,	(float)pos.z,		(float)texCoord.x + 1,	(float)texCoord.y,		(float)0, (float)1, (float)0,
 							});
 						m_indecies->insert(m_indecies->end(), { index, index + 1, index + 2, index, index + 3, index + 1 });
 						index += 4;
 					}
 					if (blockNY == BlockType::None) {
 						texCoord = bottomTexCoord;
-						m_vertecies->insert(m_vertecies->end(), { (float)pos.x,     (float)pos.y, (float)pos.z,			(float)texCoord.x,		(float)texCoord.y + 1,
-																	(float)pos.x + 1, (float)pos.y, (float)pos.z + 1,		(float)texCoord.x + 1,	(float)texCoord.y,
-																	(float)pos.x,     (float)pos.y, (float)pos.z + 1,		(float)texCoord.x + 1,	(float)texCoord.y + 1,
-																	(float)pos.x + 1, (float)pos.y, (float)pos.z,			(float)texCoord.x,		(float)texCoord.y,
+						m_vertecies->insert(m_vertecies->end(), {	(float)pos.x,		(float)pos.y,		(float)pos.z,		(float)texCoord.x,		(float)texCoord.y + 1,	(float)0, (float)-1,(float)0,
+																	(float)pos.x + 1,	(float)pos.y,		(float)pos.z + 1,	(float)texCoord.x + 1,	(float)texCoord.y,		(float)0, (float)-1,(float)0,
+																	(float)pos.x,		(float)pos.y,		(float)pos.z + 1,	(float)texCoord.x + 1,	(float)texCoord.y + 1,	(float)0, (float)-1,(float)0,
+																	(float)pos.x + 1,	(float)pos.y,		(float)pos.z,		(float)texCoord.x,		(float)texCoord.y,		(float)0, (float)-1,(float)0,
 							});
 						m_indecies->insert(m_indecies->end(), { index, index + 1, index + 2, index, index + 3, index + 1 });
 						index += 4;
 					}
 					if (blockPZ == BlockType::None) {
 						texCoord = sideTexCoord;
-						m_vertecies->insert(m_vertecies->end(), { (float)pos.x, (float)pos.y,			(float)pos.z + 1,	(float)texCoord.x,		(float)texCoord.y + 1,
-																	(float)pos.x + 1, (float)pos.y + 1, (float)pos.z + 1,	(float)texCoord.x + 1,	(float)texCoord.y,
-																	(float)pos.x + 1, (float)pos.y,     (float)pos.z + 1,	(float)texCoord.x + 1,	(float)texCoord.y + 1,
-																	(float)pos.x, (float)pos.y + 1,		(float)pos.z + 1,	(float)texCoord.x,		(float)texCoord.y,
+						m_vertecies->insert(m_vertecies->end(), { (float)pos.x,		(float)pos.y,		(float)pos.z + 1,	(float)texCoord.x,		(float)texCoord.y + 1,		(float)0, (float)0, (float)1,
+																	(float)pos.x + 1,	(float)pos.y + 1,	(float)pos.z + 1,	(float)texCoord.x + 1,	(float)texCoord.y,		(float)0, (float)0, (float)1,
+																	(float)pos.x + 1,	(float)pos.y,		(float)pos.z + 1,	(float)texCoord.x + 1,	(float)texCoord.y + 1,	(float)0, (float)0, (float)1,
+																	(float)pos.x,		(float)pos.y + 1,	(float)pos.z + 1,	(float)texCoord.x,		(float)texCoord.y,		(float)0, (float)0, (float)1,
 							});
 						m_indecies->insert(m_indecies->end(), { index, index + 1, index + 2, index, index + 3, index + 1 });
 						index += 4;
 					}
 					if (blockNZ == BlockType::None) {
 						texCoord = sideTexCoord;
-						m_vertecies->insert(m_vertecies->end(), { (float)pos.x,		(float)pos.y,     (float)pos.z,		(float)texCoord.x + 1,	(float)texCoord.y + 1,
-																	(float)pos.x + 1,	(float)pos.y + 1, (float)pos.z,		(float)texCoord.x,		(float)texCoord.y,
-																	(float)pos.x + 1,	(float)pos.y,     (float)pos.z,		(float)texCoord.x,		(float)texCoord.y + 1,
-																	(float)pos.x,		(float)pos.y + 1, (float)pos.z,		(float)texCoord.x + 1,	(float)texCoord.y,
+						m_vertecies->insert(m_vertecies->end(), {	(float)pos.x,		(float)pos.y,		(float)pos.z,		(float)texCoord.x + 1,	(float)texCoord.y + 1,	(float)0, (float)0, (float)-1,
+																	(float)pos.x + 1,	(float)pos.y + 1,	(float)pos.z,		(float)texCoord.x,		(float)texCoord.y,		(float)0, (float)0, (float)-1,
+																	(float)pos.x + 1,	(float)pos.y,		(float)pos.z,		(float)texCoord.x,		(float)texCoord.y + 1,	(float)0, (float)0, (float)-1,
+																	(float)pos.x,		(float)pos.y + 1,	(float)pos.z,		(float)texCoord.x + 1,	(float)texCoord.y,		(float)0, (float)0, (float)-1,
 							});
 						m_indecies->insert(m_indecies->end(), { index, index + 1, index + 2, index, index + 3, index + 1 });
 						index += 4;
@@ -217,13 +292,39 @@ void Chunk::GenereateRenderData() {
 
 	m_layout.reset(new BufferLayout({
 		{ ShaderDataType::Float3, "a_Position" },
-		{ ShaderDataType::Float2, "a_TexCoord" }
+		{ ShaderDataType::Float2, "a_TexCoord" },
+		{ ShaderDataType::Float3, "a_Normal" },
 		}));
-	m_WorldGenDone = true;
+
 	if (m_WorldGenHotReload) {
 		m_WorldGenHotReload = false;
 		GenereateRenderData();
 	}
+	else {
+		m_IsCalculatingRenderData = false;
+		m_FallbackVA = true;
+		m_BuffersExists = true;
+	}
+}
+
+void Chunk::UnloadRenderData()
+{
+	std::cout << TimeStep::GetTime() << " - Unload Chunk: x:" << m_ChunkPosition.x << " z: " << m_ChunkPosition.y << std::endl;
+
+	asyncChunkGenerationTask.wait();
+	asyncTask.wait();
+	m_ReadyToRender = false;
+	m_WorldGenHotReload = false; 
+	m_BuffersExists = false;
+	m_FallbackVA = false;
+	m_vertecies.reset();
+	m_indecies.reset();
+	m_ChunkIB.reset();
+	m_ChunkVB.reset();
+	m_ChunkVA.reset();
+		
+	
+
 }
 
 VertexArray* Chunk::GenerateIsles()
@@ -358,13 +459,16 @@ VertexArray* Chunk::GenerateIsles()
 	return t_ChunkVA;
 }
 
-void Chunk::sendIsleToRenderer()
-{
+void Chunk::sendIsleToRenderer(){
 	
+	assert(m_vertecies);
+	assert(m_indecies);
+	assert(m_layout->getElements().size() > 0);
 
+	m_FallbackVA = false;
 	m_ChunkVA.reset(VertexArray::Create());
 	m_ChunkVB.reset(VertexBuffer::Create(m_vertecies->data(), m_vertecies->size() * sizeof(float)));
-	m_ChunkIB;
+	
 
 	//m_ChunkVB.reset(VertexBuffer::Create(testVertecies.data(), testVertecies.size() * sizeof(float)));
 	m_ChunkVB->SetLayout(*m_layout);
@@ -373,8 +477,35 @@ void Chunk::sendIsleToRenderer()
 	//m_ChunkIB.reset(IndexBuffer::Create(squareIndicies, sizeof(squareIndicies)));
 	m_ChunkVA->SetIndexBuffer(m_ChunkIB);
 
+
+	m_FallbackVA = true;
+	m_ReadyToRender = true;
+
+}
+
+float Chunk::DistanceToGround(glm::vec3 position) const{
+
+	glm::vec3 test = glm::floor(position);
+
 	
-
-
+	glm::ivec3 blockPosition = test;
+	
+	if (GetBlock(blockPosition) == BlockType::None) {
+		for (int i = blockPosition.y; i >= 0 ; i--) {
+			blockPosition.y = i;
+			if (GetBlock(blockPosition) != BlockType::None)
+				return position.y - blockPosition.y - 1.0f;
+		}
+		return position.y;
+	}
+	else {
+		
+		for (int i = blockPosition.y + 1; i < 512; i++) {
+			blockPosition.y = i;
+			if (GetBlock(blockPosition) == BlockType::None)
+				return position.y - blockPosition.y;
+		}
+		return position.y - 512;
+	}
 }
 

@@ -17,6 +17,7 @@ IncludeDir["Glad"] = "Engine/vendor/Glad/include"
 IncludeDir["glm"] = "Engine/vendor/glm"
 IncludeDir["ImGui"] = "Engine/vendor/imgui"
 IncludeDir["stb_image"] = "Engine/vendor/stb_image"
+IncludeDir["FastNoise2"] = "Engine/vendor/FastNoise2/include"
 IncludeDir["Engine"] = "Engine/src"
 IncludeDir["Minecraft"] = "Minecraft/src"
 
@@ -26,6 +27,7 @@ group "Dependencies"
 	include "Engine/vendor/GLFW"
 	include "Engine/vendor/Glad"
 	include "Engine/vendor/imguiPremake"
+	include "Engine/vendor/FastNoise2Premake"
 group ""
 
 project "Engine"
@@ -67,6 +69,7 @@ project "Engine"
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.stb_image}",
+		"%{IncludeDir.FastNoise2}",
 		"%{IncludeDir.Engine}",
 	}
 
@@ -75,6 +78,7 @@ project "Engine"
 		"GLFW",
 		"Glad",
 		"ImGui",
+		"FastNoise2",
 	}
 
 
@@ -194,6 +198,7 @@ project "Minecraft"
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.stb_image}",
+		"%{IncludeDir.FastNoise2}",
 		"%{IncludeDir.Minecraft}",
 	}
 
@@ -203,6 +208,7 @@ project "Minecraft"
 		"GLFW",
 		"Glad",
 		"ImGui",
+		"FastNoise2",
 	}
 
 
@@ -224,6 +230,7 @@ project "Minecraft"
 	{
 		"_CONSOLE",
 		"ENGINE_PLATFORM_WINDOWS",
+		"FASTNOISE_STATIC_LIB",
 	}
 	filter "configurations:Debug"
 		defines
@@ -274,21 +281,28 @@ if _ACTION == "clean" then
 	os.remove("./Engine/Engine.vcxproj")
 	os.remove("./Engine/Engine.vcxproj.filters")
 	os.remove("./Engine/Makefile")
-	os.rmdir("./Engine/vendor/GLFW/bin/")
-	os.rmdir("./Engine/vendor/GLFW/bin-int/")
+
+	os.rmdir( "./Engine/vendor/GLFW/bin/")
+	os.rmdir( "./Engine/vendor/GLFW/bin-int/")
 	os.remove("./Engine/vendor/GLFW/GLFW.vcxproj")
 	os.remove("./Engine/vendor/GLFW/GLFW.vcxproj.filters")
 	os.remove("./Engine/vendor/GLFW/Makefile")
-	os.rmdir("./Engine/vendor/Glad/bin/")
-	os.rmdir("./Engine/vendor/Glad/bin-int/")
+
+	os.rmdir( "./Engine/vendor/Glad/bin/")
+	os.rmdir( "./Engine/vendor/Glad/bin-int/")
 	os.remove("./Engine/vendor/Glad/Glad.vcxproj")
 	os.remove("./Engine/vendor/Glad/Glad.vcxproj.filters")
 	os.remove("./Engine/vendor/Glad/Makefile")
-	os.rmdir("./Engine/vendor/imgui/bin/")
-	os.rmdir("./Engine/vendor/imgui/bin-int/")
+
+	os.rmdir( "./Engine/vendor/imgui/bin/")
+	os.rmdir( "./Engine/vendor/imgui/bin-int/")
 	os.remove("./Engine/vendor/imgui/imgui.vcxproj")
 	os.remove("./Engine/vendor/imgui/imgui.vcxproj.filters")
 	os.remove("./Engine/vendor/imgui/Makefile")
-	os.remove("./Engine/vendor/imgui/imgui.vcxproj")
-	os.remove("./Engine/vendor/imgui/imgui.vcxproj.filters")
+
+	os.rmdir( "./Engine/vendor/FastNoise2/bin/")
+	os.rmdir( "./Engine/vendor/FastNoise2/bin-int/")
+	os.remove("./Engine/vendor/FastNoise2/FastNoise2.vcxproj")
+	os.remove("./Engine/vendor/FastNoise2/FastNoise2.vcxproj.filters")
+	os.remove("./Engine/vendor/FastNoise2/Makefile")
 end

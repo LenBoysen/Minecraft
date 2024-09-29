@@ -1,4 +1,7 @@
 #include "OpenGLBuffer.h"
+#include <iostream>
+#include <chrono>
+#include <thread>
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////IndexBuffer//////////////////////////////////////////
@@ -40,7 +43,9 @@ OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t* indicies, uint32_t count)
 }
 
 
+
 OpenGLIndexBuffer::~OpenGLIndexBuffer() {
+
 	glDeleteBuffers(1, &m_RendererID);
 }
 

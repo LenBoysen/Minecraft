@@ -20,6 +20,8 @@ public:
 	inline void SetFov(float fov) { m_Fov = fov; CalculateProjectionMatrix(); }
 	inline const float GetFov() const { return m_Fov; }
 
+	inline const glm::mat4x4& GetTranslateMatrix() const { return m_TranslateMatrix; }
+	inline const glm::mat4x4& GetRotationMatrix() const { return m_RotationMatrix; }
 	inline const glm::mat4x4& GetViewMatrix() const { return m_ViewMatrix; }
 	inline const glm::mat4x4& GetProjectionMatrix() const { return m_ProjectionMatrix; }
 	inline const glm::mat4x4& GetViewProjectionMatrix() const { return m_ViewProjectionMatrix; }
@@ -32,6 +34,8 @@ private:
 
 private:
 	glm::mat4x4 m_ProjectionMatrix;
+	glm::mat4x4 m_TranslateMatrix;
+	glm::mat4x4 m_RotationMatrix;
 	glm::mat4x4 m_ViewMatrix;
 	glm::mat4x4 m_ViewProjectionMatrix;
 	

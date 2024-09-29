@@ -13,6 +13,7 @@ public:
 	inline const Ref<PerspectiveCamera> GetCamera() const { return m_Camera; }
 
 	void MoveCamera(glm::vec3 moveVector);
+	void RotateCamera(glm::vec3 rotationVector);
 
 private:
 	Ref<PerspectiveCamera> m_Camera;

@@ -25,6 +25,8 @@ public:
 private:
 	struct SceneData {
 		glm::mat4 ViewProjectionMatrix;
+		glm::mat4 ViewRotationMatrix;
+		glm::mat4 ProjectionMatrix;
 	};
 	static SceneData* s_SceneData;
 };

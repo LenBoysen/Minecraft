@@ -13,3 +13,10 @@ void CameraOperator::MoveCamera(glm::vec3 moveVector){
 	glm::vec4 finalPosition4f = translationMatrixObjectSpace * glm::vec4(worldPosition, 1.0f);
 	m_Camera->SetPosition({ finalPosition4f.x, finalPosition4f.y, finalPosition4f.z});
 }
+
+
+void CameraOperator::RotateCamera(glm::vec3 rotationVector) {
+
+
+	m_Camera->SetRotation(m_Camera->GetRotation() + rotationVector);
+}

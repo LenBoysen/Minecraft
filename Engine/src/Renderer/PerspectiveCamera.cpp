@@ -20,8 +20,13 @@ void PerspectiveCamera::CalculateProjectionMatrix()
 
 void PerspectiveCamera::CalculateViewMatrix()
 {
-	glm::mat4 transform = glm::translate(glm::mat4(1.0f), m_Position) *
-		glm::rotate(glm::rotate(glm::rotate(glm::mat4(1), glm::radians(m_Rotation.y), glm::vec3(0, 1, 0)), glm::radians(m_Rotation.x), glm::vec3(1, 0, 0)), glm::radians(m_Rotation.z), glm::vec3(0, 0, 1));
+	m_TranslateMatrix = glm::translate(glm::mat4(1.0f), m_Position);
+	m_RotationMatrix = glm::rotate(glm::rotate(glm::rotate(glm::mat4(1), glm::radians(m_Rotation.y), glm::vec3(0, 1, 0)), glm::radians(m_Rotation.x), glm::vec3(1, 0, 0)), glm::radians(m_Rotation.z), glm::vec3(0, 0, 1));
+	glm::mat4 transform = m_TranslateMatrix * m_RotationMatrix;
+	
+	m_TranslateMatrix = glm::inverse(m_TranslateMatrix);
+	m_RotationMatrix = glm::inverse(m_RotationMatrix);
+
 
 	m_ViewMatrix = glm::inverse(transform);
 
