@@ -10,3 +10,6 @@ Engine/vendor/Glad/bin/
 Engine/imgui.ini
 Minecraft/imgui.ini
 Minecraft/assets/realminecraft/
+/compile_commands
+/compile_commands.json
+**.ini
