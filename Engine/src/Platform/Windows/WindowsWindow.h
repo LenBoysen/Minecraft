@@ -8,8 +8,9 @@
 #include "events/MouseEvent.h"
 #include "Renderer/GraphicsContext.h"
 
-#include "GLFW/glfw3.h"
 #include "glad/glad.h"
+#include "GLFW/glfw3.h"
+
 #include <cassert>
 
 class WindowsWindow : public Window

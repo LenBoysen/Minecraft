@@ -3,7 +3,7 @@
 #include <iostream>
 #include "Renderer/Renderer.h"
 #include "Renderer/RendererAPI.h"
-
+#include <cassert>
 
 
 
@@ -39,7 +39,7 @@ Ref<Shader> Shader::Create(const std::string& filePath)
 
 void ShaderLibrary::Add(const std::string& name, Ref<Shader> shader)
 {
-	assert(!Exists(name), "Shader already exists");
+	assert(!Exists(name) && "Shader already exists");
 	m_Shaders[name] = shader;
 	
 }
@@ -79,7 +79,7 @@ bool ShaderLibrary::Exists(const std::string name)
 
 Ref<Shader> ShaderLibrary::Get(const std::string& name)
 {
-	assert(Exists(name), "Shader not found");
+	assert(Exists(name) && "Shader not found");
 
 	return m_Shaders[name];
 

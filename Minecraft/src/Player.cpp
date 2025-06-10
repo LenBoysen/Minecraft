@@ -1,7 +1,8 @@
 #include "Player.h"
 #include "glm/ext/matrix_transform.hpp"
 #include "World.h"
-#include <xutility>
+//#include <xutility>
+#include<algorithm>
 #include "Core/TimeStep.h"
 #include <iostream>
 #include "glm/fwd.hpp"
@@ -259,7 +260,7 @@ void Player::MovePlayer(glm::vec3 moveVector, float timeStep, Ref<World> world) 
 						m_Momentum.x = 0;
 					}
 					else {
-						assert(true, "Continue and see if this needs fixing");
+						assert(true && "Continue and see if this needs fixing");
 					}
 				}
 				else {
@@ -272,7 +273,7 @@ void Player::MovePlayer(glm::vec3 moveVector, float timeStep, Ref<World> world) 
 						m_Momentum.x = 0;
 					}
 					else {
-						assert(true, "Continue and see if this needs fixing");
+						assert(true && "Continue and see if this needs fixing");
 					}
 				}
 			}
@@ -287,7 +288,7 @@ void Player::MovePlayer(glm::vec3 moveVector, float timeStep, Ref<World> world) 
 						m_Momentum.x = 0;
 					}
 					else {
-						assert(true, "Continue and see if this needs fixing");
+						assert(true && "Continue and see if this needs fixing");
 					}
 				}
 				else {
@@ -300,7 +301,7 @@ void Player::MovePlayer(glm::vec3 moveVector, float timeStep, Ref<World> world) 
 						m_Momentum.x = 0;
 					}
 					else {
-						assert(true, "Continue and see if this needs fixing");
+						assert(true && "Continue and see if this needs fixing");
 					}
 				}
 			}

@@ -45,7 +45,13 @@ ImGuiLayer::~ImGuiLayer(){
         style.Colors[ImGuiCol_WindowBg].w = 1.0f;
     }
     try {
+		
+		#ifdef ENGINE_PLATFORM_WINDOWS
         io.Fonts->AddFontFromFileTTF("C:\\Users\\1\\AppData\\Local\\Microsoft\\Windows\\Fonts\\CaskaydiaCoveNerdFont-Regular.ttf", 18.5f, NULL, NULL);
+		#endif
+		#ifndef ENGINE_PLATFORM_WINDOWS
+        io.Fonts->AddFontFromFileTTF("/usr/share/fonts/TTF/JetBrainsMonoNerdFont-Regular.ttf", 18.5f, NULL, NULL);
+		#endif
     }
     catch(...){
         std::cerr << "Font could not load";

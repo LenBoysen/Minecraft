@@ -10,7 +10,7 @@
 #include "glm/glm.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "Renderer/Renderer.h"
-#include "gl/GL.h"
+//#include "gl/GL.h"
 
 void World::GenerateWorld()
 {

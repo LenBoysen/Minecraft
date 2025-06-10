@@ -93,7 +93,8 @@ void OpenGLShader::Compile(const std::unordered_map<GLenum, std::string>& shader
 	
 	GLuint program = glCreateProgram();
 
-	assert(shaderSources.size() <= 2, "increase array size");
+	if(shaderSources.size() > 2) std::cerr << "increase array shaderSources.size to a minimum of: " << shaderSources.size() << std::endl;
+	//assert(shaderSources.size() <= 2, "increase array size");
 	std::array<GLuint, 2> glShaderIDs;
 	//std::vector<GLuint> glShaderIDs;
 	//glShaderIDs.reserve(shaderSources.size());

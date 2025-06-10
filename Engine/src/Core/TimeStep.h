@@ -38,7 +38,7 @@ private:
 	float m_LastTime;
 	std::string m_Description;
 	std::string m_CounterName;
-	uint32_t counter = 0;
+	unsigned long int counter = 0;
 };
 
 

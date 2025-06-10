@@ -14,7 +14,9 @@ project "FastNoise2"
         "../FastNoise2/include",
 	}
 
-	buildoptions { "/arch:AVX512" }
+	--buildoptions { "/arch:AVX512" }
+	buildoptions { "-march=core-avx2" }
+	buildoptions { "-mavx512f -mavx512dq" }
 	files
 	{
         "../FastNoise2/include/**.h",
