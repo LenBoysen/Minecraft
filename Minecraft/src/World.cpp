@@ -61,7 +61,6 @@ void World::ReloadWorld()
 void World::Render()
 {
 	RenderSky();
-
 	Ref<Shader> textureShader = Application::Get().getShaderLibrary().Get("Texture");
 	std::dynamic_pointer_cast<OpenGLShader>(textureShader)->UploadUniformFloat3("u_SunPosVec", GetSunPosVec());
 	for (auto& chunkPos : m_ChunksToRender) {
@@ -281,7 +280,7 @@ void World::GenerateSkyVA() {
 
 	m_SkyVA->SetIndexBuffer(ib);
 
-	Application::Get().getShaderLibrary().Load("assets/shaders/Sky.glsl");
+	Application::Get().getShaderLibrary().Load("Minecraft/assets/shaders/Sky.glsl");
 
 	Ref<IndexBuffer> ib2rwesfsefesfsef;
 	//Ref<VertexBuffer> vb2;
@@ -318,11 +317,10 @@ void World::GenerateSkyVA() {
 	//m_SunVA->AddVertexBuffer(vb2);
 	//m_SunVA->SetIndexBuffer(ib2);
 	//
-	Application::Get().getShaderLibrary().Load("assets/shaders/Sun.glsl");
+	Application::Get().getShaderLibrary().Load("Minecraft/assets/shaders/Sun.glsl");
 }
 
 void World::RenderSky() {
-
 	Ref<Shader> SkyShader = Application::Get().getShaderLibrary().Get("Sky");
 	std::dynamic_pointer_cast<OpenGLShader>(SkyShader)->UploadUniformFloat3("u_SkyPosition", GetSunPosVec());
 

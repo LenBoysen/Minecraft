@@ -2,6 +2,7 @@
 #include "glad/glad.h"
 #include "Core.h"
 
+
 void OpenGLRendererAPI::Init()
 {
 	glEnable(GL_BLEND);
@@ -26,5 +27,6 @@ void OpenGLRendererAPI::Clear()
 
 void OpenGLRendererAPI::DrawIndexed(const Ref<VertexArray>& vertexArray)
 {
+	vertexArray->GetIndexBuffer()->Bind();
 	glDrawElements(GL_TRIANGLES, vertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 }

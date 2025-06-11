@@ -84,10 +84,10 @@ const void Block::GenerateVertexArray()
 
 	ShaderLibrary& sl = Application::Get().getShaderLibrary();
 
-	s_Block->m_CubeTextureShader = sl.Load("assets/shaders/Texture.glsl");
+	s_Block->m_CubeTextureShader = sl.Load("Minecraft/assets/shaders/Texture.glsl");
 	
 
-	s_Block->m_Texture = Texture2D::Create("assets/textures/terrain.png");
+	s_Block->m_Texture = Texture2D::Create("Minecraft/assets/textures/terrain.png");
 	
 	s_Block->m_Texture->Bind(0);
 	//s_Block->m_CubeTextureShader->UploadUniformInt("u_Texture", 0);

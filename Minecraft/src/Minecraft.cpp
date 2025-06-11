@@ -194,9 +194,8 @@ class Minecraft : public Application {
 public:
 	Minecraft() : Application(WindowProps("Minecraft", 1920, 1080)) {
 		getWindow().SetVSync(false);
-		getWindow().SetIcon("assets/textures/logo.png");
+		getWindow().SetIcon("Minecraft/assets/textures/logo.png");
 		pushLayer(new Minecraft3DLayer);
-
 
 
 	}

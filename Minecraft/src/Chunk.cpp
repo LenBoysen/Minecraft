@@ -24,11 +24,11 @@ Chunk::Chunk(glm::ivec2 chunkPosition)
 
 	ShaderLibrary& sl = Application::Get().getShaderLibrary();
 
-	m_ChunkTextureShader = sl.Load("assets/shaders/Texture.glsl");
+	m_ChunkTextureShader = sl.Load("Minecraft/assets/shaders/Texture.glsl");
 
 
 
-	m_Texture = Texture2D::Create("assets/textures/terrain.png");
+	m_Texture = Texture2D::Create("Minecraft/assets/textures/terrain.png");
 
 	m_Texture->Bind(0);
 	//s_Block->m_CubeTextureShader->UploadUniformInt("u_Texture", 0);
